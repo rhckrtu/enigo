@@ -60,3 +60,11 @@ emerge -a xdotool
 ## Migrating from a previous version
 
 Please have a look at our [changelog](CHANGES.md) to find out what you have to do, if you used a previous version.
+
+## Testing this crate
+
+*Warning*: The tests will move the mouse, enter text, press keys and open some applications. Read the test cases before you run them so you know what to expect. It's best to close everything so that the tests don't mess with your system. Some of them run for a long time because they are intended to be run in the CI. Make sure to run the tests sequentially, otherwise they will fail because other mouse movements or entered keys are detected. You can do so by running
+
+```Bash
+cargo test --all-features -- --test-threads 1
+```
