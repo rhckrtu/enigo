@@ -53,6 +53,9 @@
 #[macro_use]
 extern crate objc;
 
+#[cfg(test)]
+use strum_macros::EnumIter;
+
 // TODO(dustin) use interior mutability not &mut self
 
 #[cfg(target_os = "windows")]
@@ -265,6 +268,7 @@ pub trait MouseControllable {
 /// For alphabetical keys, use [`Key::Layout`] for a system independent key.
 /// If a key is missing, you can use the raw keycode with [`Key::Raw`].
 #[cfg_attr(feature = "with_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(test, derive(EnumIter))]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Key {
     /// alt key on Linux and Windows (option key on macOS)
@@ -443,5 +447,149 @@ use std::fmt;
 impl fmt::Debug for Enigo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Enigo")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Enigo, Key, KeyboardControllable};
+    use std::thread;
+    use std::time::Duration;
+
+    #[test]
+    // Try entering various texts that were selected to test edge cases.
+    // Because it is hard to test if they succeed,
+    // we assume it worked as long as there was no panic
+    fn test_key_sequence() {
+        thread::sleep(Duration::from_secs(2));
+        let mut enigo = Enigo::new();
+
+        // Empty string
+        let sequence = "";
+        enigo.key_sequence(sequence);
+
+        // Simple character
+        let sequence = "a";
+        enigo.key_sequence(sequence);
+
+        // Simple character
+        let sequence = "z"; // TODO: This enters "y" on my computer
+        enigo.key_sequence(sequence);
+
+        // Number
+        let sequence = "9";
+        enigo.key_sequence(sequence);
+
+        // Special character
+        let sequence = "%";
+        enigo.key_sequence(sequence);
+
+        // Special char which needs two u16s to be encoded";
+        let sequence = "𝕊";
+        enigo.key_sequence(sequence);
+
+        // Single emoji
+        let sequence = "❤️";
+        enigo.key_sequence(sequence);
+
+        // Simple short character string (shorter than 20 chars)
+        let sequence = "abcde";
+        enigo.key_sequence(sequence);
+
+        // Simple long character string (longer than 20 chars to test the restrictions
+        // of the macOS implementation)
+        let sequence =
+            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+        enigo.key_sequence(sequence);
+
+        // Short arabic string (meaning "Arabic")
+        let sequence = "اَلْعَرَبِيَّةُ";
+        enigo.key_sequence(sequence);
+
+        // Short chinese string (meaning "Chinese")
+        let sequence = "中文";
+        enigo.key_sequence(sequence);
+
+        // Short japanese string (meaning "Japanese")
+        let sequence = "日本語"; // TODO: On my computer "日" is not entered
+        enigo.key_sequence(sequence);
+
+        // Long character string where a character starts at the 19th byte and ends at
+        // the 20th byte
+        let sequence = "aaaaaaaaaaaaaaaaaaa𝕊𝕊";
+        enigo.key_sequence(sequence);
+
+        // Long character string where an emoji starts at the 19th byte and ends at
+        // the 20th byte
+        let sequence = "aaaaaaaaaaaaaaaaaaa❤️❤️";
+        enigo.key_sequence(sequence);
+
+        // Long string where all 22 characters have a length of two in the utf-16
+        // encoding
+        let sequence = "𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊"; // TODO: This is only entering 21x instead of 22x "𝕊"
+        enigo.key_sequence(sequence);
+
+        // Long arabic string (longer than 20 chars to test the restrictions
+        // of the macOS implementation)
+        let sequence = "اَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُ"; // TODO: This is missing the character on the very right
+        enigo.key_sequence(sequence);
+
+        // Long chinese string
+        let sequence = "中文中文中文中文中文中文";
+        enigo.key_sequence(sequence);
+
+        // Long japanese string
+        let sequence = "日本語日本語日本語日本語日本語日本語日本語";
+        enigo.key_sequence(sequence);
+
+        // Long string including characters from various languages, emoji and complex
+        // characters
+        let sequence = "H3llo World ❤️💯. What'𝕊 üp {}#𝄞\\日本語اَلْعَرَبِيَّةُ"; // TODO: The part "üp {}#\\" is messed up
+        enigo.key_sequence(sequence);
+    }
+
+    #[ignore] // TODO: Currently ignored because not all chars are valid CStrings
+    #[test]
+    // Try entering all UTF-16 chars with the key_sequence function.
+    // Because it is hard to test if they succeed,
+    // we assume it worked as long as there was no panic
+    fn test_key_sequence_all_utf16() {
+        thread::sleep(Duration::from_secs(2));
+        let mut enigo = Enigo::new();
+        for c in 0x0000..0x0010_FFFF {
+            if let Some(character) = char::from_u32(c) {
+                println!("{character}");
+                enigo.key_sequence(&character.to_string());
+            };
+        }
+    }
+
+    #[test]
+    // Test all the keys, make sure none of them panic
+    fn test_key_click() {
+        use strum::IntoEnumIterator;
+
+        let mut enigo = Enigo::new();
+        for key in Key::iter() {
+            //println!("{key:?}");
+            enigo.key_down(key);
+            enigo.key_up(key);
+            enigo.key_click(key);
+        }
+
+        // TODO: Add tests for Key::Raw and Key::Layout
+    }
+
+    #[ignore]
+    // TODO: Currently ignored because the DSL needs a lot of work and changes so it doesn't make
+    // sense to write a lot of tests for it for now
+    #[test]
+    // Tests the DSL
+    fn dsl() {
+        let mut enigo = Enigo::new();
+        let sequence = "{+UNICODE}{{Hello World!}} ❤️{-UNICODE}{+CTRL}a{-CTRL}";
+
+        enigo.key_sequence_parse(sequence);
+        enigo.key_sequence_parse_try(sequence).unwrap();
     }
 }
