@@ -79,6 +79,7 @@ fn test_key_click() {
     // Key::Raw and Key::Layout are ignored. They are tested separately
 }
 
+#[ignore]
 #[test]
 // Try entering all chars with Key::Layout and make sure none of them panic
 fn test_key_layout_all_utf16() {

@@ -57,9 +57,9 @@ jobs:
         run: cargo check --examples --all-features
 
       - name: Test the code
-        run: cargo test -- --test-threads 1
+        run: cargo test -- --test-threads 1 --nocapture
       - name: Test the code with all features enabled
-        run: cargo test --all-features -- --test-threads 1
+        run: cargo test --all-features -- --test-threads 1 --nocapture
 
       - name: Setup headless display for integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now

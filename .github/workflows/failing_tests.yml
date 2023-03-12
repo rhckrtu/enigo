@@ -34,9 +34,9 @@ jobs:
           components: rustfmt, clippy
 
       - name: Test the code
-        run: cargo test -- --test-threads 1 --include-ignored
+        run: cargo test -- --test-threads 1 --include-ignored --nocapture
       - name: Test the code with all features enabled
-        run: cargo test --all-features -- --test-threads 1 --include-ignored
+        run: cargo test --all-features -- --test-threads 1 --include-ignored --nocapture
 
       - name: Setup headless display for integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now
