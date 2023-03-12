@@ -49,7 +49,7 @@ fn test_key_sequence() {
 
 #[ignore] // TODO: Currently ignored because not all chars are valid CStrings
 #[test]
-// Try entering all UTF-16 chars with the key_sequence function.
+// Try entering all chars with the key_sequence function.
 // Because it is hard to test if they succeed,
 // we assume it worked as long as there was no panic
 fn test_key_sequence_all_utf16() {
