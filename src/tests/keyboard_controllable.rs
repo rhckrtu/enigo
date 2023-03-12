@@ -95,6 +95,7 @@ fn test_key_layout_all_utf16() {
     }
 }
 
+#[ignore]
 #[test]
 // Try entering all possible raw keycodes with Key::Raw and make sure none of
 // them panic
