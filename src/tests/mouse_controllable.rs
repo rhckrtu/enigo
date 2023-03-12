@@ -132,21 +132,22 @@ fn test_mouse_move_rel() {
 // displays dimensions so we just make sure it is greater than 0x0.
 fn test_display_size() {
     let enigo = Enigo::new();
+    let display_size = enigo.main_display_size();
+    println!("Main display size: {}x{}", display_size.0, display_size.1);
+    if !is_ci() {
+        assert!(display_size.0 > 0);
+        assert!(display_size.1 > 0);
+        return;
+    }
+
     let ci_display = if cfg!(macos) {
         (1176, 885)
     } else {
         (1024, 768)
     };
 
-    let display_size = enigo.main_display_size();
-    println!("Main display size: {}x{}", display_size.0, display_size.1);
-    if is_ci() {
-        assert_eq!(display_size.0, ci_display.0);
-        assert_eq!(display_size.1, ci_display.1);
-    } else {
-        assert!(display_size.0 > 0);
-        assert!(display_size.1 > 0);
-    };
+    assert_eq!(display_size.0, ci_display.0);
+    assert_eq!(display_size.1, ci_display.1);
 }
 
 #[test]
