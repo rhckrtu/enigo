@@ -5,8 +5,7 @@ mod common;
 use common::BrowserEvent;
 
 #[test]
-#[ignore]
-fn browser_events() {
+fn integration_browser_events() {
     let (tx, rs) = channel::<BrowserEvent>();
     println!("Created channel");
     std::thread::spawn(move || common::launch_ws_server(tx));

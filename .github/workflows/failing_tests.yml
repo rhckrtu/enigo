@@ -38,13 +38,13 @@ jobs:
         uses: ./.github/actions/headless_display
         
       - name: Test the code
-        run: cargo test -- --test-threads=1 --include-ignored --nocapture
+        run: cargo test unit -- --test-threads=1 --include-ignored --nocapture
       - name: Test the code with all features enabled
-        run: cargo test --all-features -- --test-threads=1 --include-ignored --nocapture
+        run: cargo test unit --all-features -- --test-threads=1 --include-ignored --nocapture
 
       - name: Run integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now
-        run: cargo test --all-features -- --test-threads=1 --include-ignored --nocapture
+        run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
 
       - name: Install Miri
         if: ${{ matrix.rust }} == 'nightly' # Miri only works on Nightly

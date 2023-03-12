@@ -5,7 +5,7 @@ use std::thread;
 // Try entering various texts that were selected to test edge cases.
 // Because it is hard to test if they succeed,
 // we assume it worked as long as there was no panic
-fn test_key_sequence() {
+fn unit_key_sequence() {
     thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
 
@@ -50,7 +50,7 @@ fn test_key_sequence() {
 // Try entering all chars with the key_sequence function.
 // Because it is hard to test if they succeed,
 // we assume it worked as long as there was no panic
-fn test_key_sequence_all_utf16() {
+fn unit_key_sequence_all_utf16() {
     thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
     for c in 0x0000..0x0010_FFFF {
@@ -63,7 +63,7 @@ fn test_key_sequence_all_utf16() {
 
 #[test]
 // Test all the keys, make sure none of them panic
-fn test_key_click() {
+fn unit_key_click() {
     use strum::IntoEnumIterator;
 
     thread::sleep(super::get_delay());
@@ -80,7 +80,7 @@ fn test_key_click() {
 #[ignore]
 #[test]
 // Try entering all chars with Key::Layout and make sure none of them panic
-fn test_key_layout_all_utf16() {
+fn unit_key_layout_all_utf16() {
     thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
     for c in 0x0000..=0x0010_FFFF {
@@ -97,7 +97,7 @@ fn test_key_layout_all_utf16() {
 #[test]
 // Try entering all possible raw keycodes with Key::Raw and make sure none of
 // them panic
-fn test_key_raw_all_keycodes() {
+fn unit_key_raw_all_keycodes() {
     thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
     for raw_keycode in 0..=u16::MAX {

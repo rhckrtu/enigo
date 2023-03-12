@@ -5,7 +5,7 @@ use super::is_ci;
 
 #[test]
 // Test the mouse_move_to function and check it with the mouse_location function
-fn test_mouse_move_to() {
+fn unit_mouse_move_to() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
@@ -40,7 +40,7 @@ fn test_mouse_move_to() {
 #[test]
 // Test the mouse_move_relative function and check it with the mouse_location
 // function
-fn test_mouse_move_rel() {
+fn unit_mouse_move_rel() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
@@ -76,7 +76,7 @@ fn test_mouse_move_rel() {
 #[ignore]
 #[test]
 // Test the mouse_move_to function and check it with the mouse_location function
-fn test_mouse_move_to_boundaries() {
+fn unit_mouse_move_to_boundaries() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
@@ -127,7 +127,7 @@ fn test_mouse_move_to_boundaries() {
 #[test]
 // Test the mouse_move_relative function and check it with the mouse_location
 // function
-fn test_mouse_move_rel_boundaries() {
+fn unit_mouse_move_rel_boundaries() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
@@ -182,7 +182,7 @@ fn test_mouse_move_rel_boundaries() {
 // The CI's virtual display has a dimension of 1024x768 (except on macOS where
 // it is 1176x885). If the test is ran outside of the CI, we don't know the
 // displays dimensions so we just make sure it is greater than 0x0.
-fn test_display_size() {
+fn unit_display_size() {
     let enigo = Enigo::new();
     let display_size = enigo.main_display_size();
     println!("Main display size: {}x{}", display_size.0, display_size.1);
@@ -205,7 +205,7 @@ fn test_display_size() {
 
 #[test]
 // Test all the mouse buttons, make sure none of them panic
-fn test_button_click() {
+fn unit_button_click() {
     use strum::IntoEnumIterator;
 
     thread::sleep(super::get_delay());
@@ -220,7 +220,7 @@ fn test_button_click() {
 
 #[test]
 // Click each mouse button ten times, make sure none of them panic
-fn test_10th_click() {
+fn unit_10th_click() {
     use strum::IntoEnumIterator;
 
     thread::sleep(super::get_delay());
@@ -234,7 +234,7 @@ fn test_10th_click() {
 
 #[test]
 // Click each mouse button ten times, make sure none of them panic
-fn test_scroll() {
+fn unit_scroll() {
     let delay = super::get_delay();
     let mut enigo = Enigo::new();
 
@@ -254,7 +254,7 @@ fn test_scroll() {
 
 #[test]
 // Press down and drag the mouse
-fn test_mouse_drag() {
+fn unit_mouse_drag() {
     let delay = super::get_delay();
     let mut enigo = Enigo::new();
 
