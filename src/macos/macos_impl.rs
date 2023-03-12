@@ -93,7 +93,7 @@ impl Default for Enigo {
     fn default() -> Self {
         let double_click_delay = Duration::from_secs(1);
         let double_click_delay_setting: f64 =
-            unsafe { msg_send![class!(NSEvent), doubleClickInterval] } as f64; // Returns the double click interval (https://developer.apple.com/documentation/appkit/nsevent/1528384-doubleclickinterval). This is a TimeInterval which is a f64 of the number of seconds
+            unsafe { msg_send![class!(NSEvent), doubleClickInterval] }; // Returns the double click interval (https://developer.apple.com/documentation/appkit/nsevent/1528384-doubleclickinterval). This is a TimeInterval which is a f64 of the number of seconds
         let double_click_delay = double_click_delay.mul_f64(double_click_delay_setting);
 
         Enigo {
