@@ -192,7 +192,7 @@ fn test_display_size() {
         return;
     }
 
-    let ci_display = if cfg!(macos) {
+    let ci_display = if cfg!(macOS) {
         (1176, 885)
     } else {
         (1024, 768)
