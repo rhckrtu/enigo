@@ -1,6 +1,5 @@
 use crate::{Enigo, KeyboardControllable};
 use std::thread;
-use std::time::Duration;
 
 #[ignore]
 // TODO: Currently ignored because the DSL needs a lot of work and changes so it doesn't make
@@ -8,7 +7,7 @@ use std::time::Duration;
 #[test]
 // Tests the DSL
 fn dsl() {
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
     let sequence = "{+UNICODE}{{Hello World!}} ❤️{-UNICODE}{+CTRL}a{-CTRL}";
 

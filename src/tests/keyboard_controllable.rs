@@ -1,6 +1,5 @@
 use crate::{Enigo, Key, KeyboardControllable};
 use std::thread;
-use std::time::Duration;
 
 #[test]
 // Try entering various texts that were selected to test edge cases.
@@ -54,7 +53,7 @@ fn test_key_sequence() {
 // Because it is hard to test if they succeed,
 // we assume it worked as long as there was no panic
 fn test_key_sequence_all_utf16() {
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
     for c in 0x0000..0x0010_FFFF {
         if let Some(character) = char::from_u32(c) {
@@ -69,28 +68,42 @@ fn test_key_sequence_all_utf16() {
 fn test_key_click() {
     use strum::IntoEnumIterator;
 
+    thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
     for key in Key::iter() {
-        //println!("{key:?}");
+        println!("{key:?}");
         enigo.key_down(key);
         enigo.key_up(key);
         enigo.key_click(key);
     }
-
-    // TODO: Add tests for Key::Raw and Key::Layout
+    // Key::Raw and Key::Layout are ignored. They are tested separately
 }
 
 #[test]
 // Try entering all chars with Key::Layout and make sure none of them panic
 fn test_key_layout_all_utf16() {
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(super::get_delay());
     let mut enigo = Enigo::new();
-    for c in 0x0000..0x0010_FFFF {
+    for c in 0x0000..=0x0010_FFFF {
         if let Some(character) = char::from_u32(c) {
             println!("{character}");
             enigo.key_down(Key::Layout(character));
             enigo.key_up(Key::Layout(character));
             enigo.key_click(Key::Layout(character));
         };
+    }
+}
+
+#[test]
+// Try entering all possible raw keycodes with Key::Raw and make sure none of
+// them panic
+fn test_key_raw_all_keycodes() {
+    thread::sleep(super::get_delay());
+    let mut enigo = Enigo::new();
+    for raw_keycode in 0..=u16::MAX {
+        println!("{raw_keycode}");
+        enigo.key_down(Key::Raw(raw_keycode));
+        enigo.key_up(Key::Raw(raw_keycode));
+        enigo.key_click(Key::Raw(raw_keycode));
     }
 }

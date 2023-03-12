@@ -143,12 +143,64 @@ fn test_display_size() {
     };
 }
 
-/*
+#[test]
+// Test all the mouse buttons, make sure none of them panic
+fn test_button_click() {
+    use strum::IntoEnumIterator;
 
-   fn mouse_down(&mut self, button: MouseButton);
-   fn mouse_up(&mut self, button: MouseButton);
-   fn mouse_click(&mut self, button: MouseButton);
-   fn mouse_scroll_x(&mut self, length: i32);
-   fn mouse_scroll_y(&mut self, length: i32);
+    thread::sleep(super::get_delay());
+    let mut enigo = Enigo::new();
+    for button in MouseButton::iter() {
+        println!("{button:?}");
+        enigo.mouse_down(button);
+        enigo.mouse_up(button);
+        enigo.mouse_click(button);
+    }
+}
 
-*/
+#[test]
+// Click each mouse button ten times, make sure none of them panic
+fn test_10th_click() {
+    use strum::IntoEnumIterator;
+
+    thread::sleep(super::get_delay());
+    let mut enigo = Enigo::new();
+    for button in MouseButton::iter() {
+        for _ in 0..10 {
+            enigo.mouse_click(button);
+        }
+    }
+}
+
+#[test]
+// Click each mouse button ten times, make sure none of them panic
+fn test_scroll() {
+    let delay = super::get_delay();
+    let mut enigo = Enigo::new();
+
+    let test_cases = vec![0, 1, 5, 100, 57899, -57899, -0, -1, -5, -100];
+
+    for length in &test_cases {
+        thread::sleep(delay);
+        println!("scroll x{length}");
+        enigo.mouse_scroll_x(*length);
+    }
+    for length in &test_cases {
+        thread::sleep(delay);
+        println!("scroll x{length}");
+        enigo.mouse_scroll_y(*length);
+    }
+}
+
+#[test]
+// Press down and drag the mouse
+fn test_mouse_drag() {
+    let delay = super::get_delay();
+    let mut enigo = Enigo::new();
+
+    enigo.mouse_move_to(500, 200);
+    enigo.mouse_down(MouseButton::Left);
+    enigo.mouse_move_relative(100, 100);
+    thread::sleep(delay);
+    enigo.mouse_up(MouseButton::Left);
+}
