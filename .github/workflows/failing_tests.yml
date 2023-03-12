@@ -1,4 +1,4 @@
-name: CI
+name: failing_tests
 
 permissions:
   contents: read
@@ -12,7 +12,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  ci:
+  additional_tests:
     strategy:
       fail-fast: false
       matrix:
@@ -33,33 +33,10 @@ jobs:
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
 
-      - name: Check the code format
-        run: cargo fmt -- --check
-
-      - name: Check clippy lints
-        run: cargo clippy --all-targets --all-features -- -D clippy::pedantic
-      - name: Check clippy lints for the examples
-        run: cargo clippy --all-targets --all-features --examples -- -D clippy::pedantic
-
-      - name: Build the code
-        run: cargo build
-      - name: Build the code with all features enabled
-        run: cargo build --all-features
-
-      - name: Build the docs
-        run: cargo doc
-      - name: Build the docs with all features enabled
-        run: cargo doc --all-features
-
-      - name: Build the examples
-        run: cargo check --examples
-      - name: Build the examples with all features enabled
-        run: cargo check --examples --all-features
-
       - name: Test the code
-        run: cargo test -- --test-threads 1
+        run: cargo test -- --test-threads 1 --include-ignored
       - name: Test the code with all features enabled
-        run: cargo test --all-features -- --test-threads 1
+        run: cargo test --all-features -- --test-threads 1 --include-ignored
 
       - name: Setup headless display for integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now
@@ -67,3 +44,14 @@ jobs:
       - name: Run integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now
         run: cargo test --all-features -- --test-threads 1 --include-ignored --nocapture
+
+      - name: Install Miri
+        if: ${{ matrix.rust }} == 'nightly' # Miri only works on Nightly
+        run: |
+          rustup toolchain install nightly --component miri
+          rustup override set nightly
+          cargo clean
+          cargo miri setup
+      - name: Run Miri to check unsafe code
+        if: ${{ matrix.rust }} == 'nightly' # Miri only works on Nightly
+        run: cargo miri test --verbose --all-features 
