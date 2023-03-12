@@ -192,7 +192,8 @@ fn test_display_size() {
         return;
     }
 
-    let ci_display = if cfg!(macOS) {
+    let ci_display = if cfg!(target_os = "macos") {
+        println!("You are on macOS");
         (1176, 885)
     } else {
         (1024, 768)
