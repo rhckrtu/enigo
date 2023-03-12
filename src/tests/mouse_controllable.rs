@@ -24,32 +24,7 @@ fn test_mouse_move_to() {
         ((0, 0), (0, 0)),
     ];
 
-    // Move the mouse outside of the boundaries of the screen
-    let screen_boundaries = vec![
-        ((-3, 8), (0, 8)),                             // Negative x coordinate
-        ((8, -3), (8, 0)),                             // Negative y coordinate
-        ((-30, -3), (0, 0)),                           // Try to go to negative x and y coordinates
-        ((567_546_546, 20), (display_size.0 - 1, 20)), // Huge x coordinate > screen width
-        ((20, 567_546_546), (20, display_size.1 - 1)), // Huge y coordinate > screen heigth
-        (
-            (567_546_546, 567_546_546),
-            (display_size.0 - 1, display_size.1 - 1),
-        ), /* Huge x and y coordinate > screen width
-                                                        * and screen
-                                                        * height */
-        ((i32::MAX, 37), (0, 37)),              // Max x coordinate
-        ((20, i32::MAX), (20, 0)),              // Max y coordinate
-        ((i32::MAX, i32::MAX), (0, 0)),         // Max x and max y coordinate
-        ((i32::MAX - 1, i32::MAX - 1), (0, 0)), // Max x and max y coordinate -1
-        ((i32::MIN, 20), (0, 20)),              // Min x coordinate
-        ((20, i32::MIN), (20, 0)),              // Min y coordinate
-        ((i32::MIN, i32::MIN), (0, 0)),         // Min x and min y coordinate
-        ((i32::MIN, i32::MAX), (0, 0)),         // Min x and max y coordinate
-        ((i32::MAX, i32::MIN), (0, 0)),         // Max x and min y coordinate
-    ];
-
-    let test_cases = vec![square, screen_boundaries];
-
+    let test_cases = vec![square];
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
@@ -85,6 +60,83 @@ fn test_mouse_move_rel() {
         ((-100, 0), (0, 0)),
     ];
 
+    let test_cases = vec![square];
+    for test_case in test_cases {
+        for mouse_action in test_case {
+            println!("Move {}, {}", mouse_action.0 .0, mouse_action.0 .1);
+            enigo.mouse_move_relative(mouse_action.0 .0, mouse_action.0 .1);
+            let (x_res, y_res) = enigo.mouse_location();
+            assert_eq!(mouse_action.1 .0, x_res);
+            assert_eq!(mouse_action.1 .1, y_res);
+            thread::sleep(delay);
+        }
+    }
+}
+
+#[ignore]
+#[test]
+// Test the mouse_move_to function and check it with the mouse_location function
+fn test_mouse_move_to_boundaries() {
+    let delay = super::get_delay();
+
+    thread::sleep(delay);
+    let mut enigo = Enigo::new();
+
+    let display_size = enigo.main_display_size();
+    println!("Display size {} x {}", display_size.0, display_size.1);
+
+    // Move the mouse outside of the boundaries of the screen
+    let screen_boundaries = vec![
+        ((-3, 8), (0, 8)),                             // Negative x coordinate
+        ((8, -3), (8, 0)),                             // Negative y coordinate
+        ((-30, -3), (0, 0)),                           // Try to go to negative x and y coordinates
+        ((567_546_546, 20), (display_size.0 - 1, 20)), // Huge x coordinate > screen width
+        ((20, 567_546_546), (20, display_size.1 - 1)), // Huge y coordinate > screen heigth
+        (
+            (567_546_546, 567_546_546),
+            (display_size.0 - 1, display_size.1 - 1),
+        ), /* Huge x and y coordinate > screen width
+                                                        * and screen
+                                                        * height */
+        ((i32::MAX, 37), (0, 37)),              // Max x coordinate
+        ((20, i32::MAX), (20, 0)),              // Max y coordinate
+        ((i32::MAX, i32::MAX), (0, 0)),         // Max x and max y coordinate
+        ((i32::MAX - 1, i32::MAX - 1), (0, 0)), // Max x and max y coordinate -1
+        ((i32::MIN, 20), (0, 20)),              // Min x coordinate
+        ((20, i32::MIN), (20, 0)),              // Min y coordinate
+        ((i32::MIN, i32::MIN), (0, 0)),         // Min x and min y coordinate
+        ((i32::MIN, i32::MAX), (0, 0)),         // Min x and max y coordinate
+        ((i32::MAX, i32::MIN), (0, 0)),         // Max x and min y coordinate
+    ];
+
+    let test_cases = vec![screen_boundaries];
+
+    for test_case in test_cases {
+        for mouse_action in test_case {
+            println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
+            enigo.mouse_move_to(mouse_action.0 .0, mouse_action.0 .1);
+            let (x_res, y_res) = enigo.mouse_location();
+            assert_eq!(mouse_action.1 .0, x_res);
+            assert_eq!(mouse_action.1 .1, y_res);
+            thread::sleep(delay);
+        }
+    }
+}
+
+#[ignore]
+#[test]
+// Test the mouse_move_relative function and check it with the mouse_location
+// function
+fn test_mouse_move_rel_boundaries() {
+    let delay = super::get_delay();
+
+    thread::sleep(delay);
+    let mut enigo = Enigo::new();
+    enigo.mouse_move_to(0, 0); // Move to absolute start position
+
+    let display_size = enigo.main_display_size();
+    println!("Display size {} x {}", display_size.0, display_size.1);
+
     // Move the mouse outside of the boundaries of the screen
     let screen_boundaries = vec![
         ((-3, 8), (0, 8)),                             // Negative x coordinate
@@ -111,7 +163,7 @@ fn test_mouse_move_rel() {
         ((i32::MAX, i32::MIN), (0, 0)),               // Max x and min y coordinate
     ];
 
-    let test_cases = vec![square, screen_boundaries];
+    let test_cases = vec![screen_boundaries];
 
     for test_case in test_cases {
         for mouse_action in test_case {

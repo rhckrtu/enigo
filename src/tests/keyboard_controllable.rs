@@ -10,10 +10,9 @@ fn test_key_sequence() {
     let mut enigo = Enigo::new();
 
     let sequences = vec![
-        "",  // Empty string
-        "a", // Simple character
-        "z", /* Simple character
-             TODO: This enters "y" on my computer */
+        "",      /* Empty string */
+        "a",     // Simple character
+        "z",     // Simple character     // TODO: This enters "y" on my computer
         "9",     // Number
         "%",     // Special character
         "𝕊",     // Special char which needs two u16s to be encoded
@@ -22,19 +21,18 @@ fn test_key_sequence() {
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", /* Simple long character string (longer than 20 chars to test the restrictions of the macOS implementation) */
         "اَلْعَرَبِيَّةُ", // Short arabic string (meaning "Arabic")
         "中文",    // Short chinese string (meaning "Chinese")
-        "日本語",  /* Short japanese string (meaning "Japanese") // TODO: On my computer "日" is
-                    * not entered */
-        "aaaaaaaaaaaaaaaaaaa𝕊𝕊", /* Long character string where a character starts at the 19th
-                                  * byte and ends at the 20th byte */
-        "aaaaaaaaaaaaaaaaaaa❤️❤️", /* Long character string where an emoji starts at the 19th byte
-                                  * and ends at the 20th byte */
-        "𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊", /* Long string where all 22 characters have a length of two in
-                                   * the utf-16 encoding */
-        "اَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُ", /* Long arabic string (longer than 20
-                                                       * chars to test the restrictions of the
-                                                       * macOS implementation)
-                                                       * // TODO: This is missing the character on the very right
-                                                       */
+        "日本語",  // Short japanese string (meaning "Japanese") // TODO: On my computer "日" is
+        // not entered
+        "aaaaaaaaaaaaaaaaaaa𝕊𝕊", // Long character string where a character starts at the 19th
+        // byte and ends at the 20th byte
+        "aaaaaaaaaaaaaaaaaaa❤️❤️", // Long character string where an emoji starts at the 19th byte
+        // and ends at the 20th byte
+        "𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊𝕊", // Long string where all 22 characters have a length of two in
+        // the utf-16 encoding
+        "اَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُاَلْعَرَبِيَّةُ", // Long arabic string (longer than 20
+        // chars to test the restrictions of the
+        // macOS implementation)
+        // TODO: This is missing the character on the very right
         "中文中文中文中文中文中文", // Long chinese string
         "日本語日本語日本語日本語日本語日本語日本語", // Long japanese string
         "H3llo World ❤️💯. What'𝕊 üp {}#𝄞\\日本語اَلْعَرَبِيَّةُ", /* Long string including characters
