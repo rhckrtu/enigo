@@ -127,16 +127,22 @@ fn test_mouse_move_rel() {
 
 #[test]
 // Test the main_display_size function
-// The CI's virtual display has a dimension of 1024x768. If the test is ran
-// outside of the CI, we don't know the displays dimensions so we just make sure
-// it is greater than 0x0.
+// The CI's virtual display has a dimension of 1024x768 (except on macOS where
+// it is 1176x885). If the test is ran outside of the CI, we don't know the
+// displays dimensions so we just make sure it is greater than 0x0.
 fn test_display_size() {
     let enigo = Enigo::new();
+    let ci_display = if cfg!(macos) {
+        (1176, 885)
+    } else {
+        (1024, 768)
+    };
+
     let display_size = enigo.main_display_size();
     println!("Main display size: {}x{}", display_size.0, display_size.1);
     if is_ci() {
-        assert_eq!(display_size.0, 1024);
-        assert_eq!(display_size.1, 768);
+        assert_eq!(display_size.0, ci_display.0);
+        assert_eq!(display_size.1, ci_display.1);
     } else {
         assert!(display_size.0 > 0);
         assert!(display_size.1 > 0);
