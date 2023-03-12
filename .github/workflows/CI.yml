@@ -56,14 +56,15 @@ jobs:
       - name: Build the examples with all features enabled
         run: cargo check --examples --all-features
 
+      - name: Setup headless display for integration tests
+        if: runner.os == 'Linux' # The integration tests only work on Linux right now
+        uses: ./.github/actions/headless_display
+        
       - name: Test the code
         run: cargo test -- --test-threads=1 --nocapture
       - name: Test the code with all features enabled
         run: cargo test --all-features -- --test-threads=1 --nocapture
 
-      - name: Setup headless display for integration tests
-        if: runner.os == 'Linux' # The integration tests only work on Linux right now
-        uses: ./.github/actions/headless_display
       - name: Run integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now
         run: cargo test --all-features -- --test-threads=1 --include-ignored --nocapture
