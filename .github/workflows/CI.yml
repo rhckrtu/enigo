@@ -66,5 +66,5 @@ jobs:
         run: cargo test unit --all-features -- --test-threads=1 --nocapture
 
       - name: Run integration tests
-        if: runner.os == 'Linux' # The integration tests only work on Linux right now
+        if: runner.os != 'Windows' # The integration tests only work on Linux right now
         run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
