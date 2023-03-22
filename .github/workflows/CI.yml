@@ -77,4 +77,5 @@ jobs:
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'desktop_after.jpg'
-        if: runner.os == 'macOS'
+        if: always() && runner.os == 'macOS'
+
