@@ -65,6 +65,16 @@ jobs:
       - name: Test the code with all features enabled
         run: cargo test unit --all-features -- --test-threads=1 --nocapture
 
+      - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        with:
+          file-name: 'desktop_before.jpg'
+        if: runner.os == 'macOS'
+
       - name: Run integration tests
         if: runner.os != 'Windows' # The integration tests only work on Linux right now
         run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
+
+      - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        with:
+          file-name: 'desktop_after.jpg'
+        if: runner.os == 'macOS'
