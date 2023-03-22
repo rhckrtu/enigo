@@ -19,7 +19,7 @@ fn is_ci() -> bool {
 // mouse moves but don't waste time in the CI
 fn get_delay() -> Duration {
     if is_ci() {
-        Duration::from_millis(2)
+        Duration::from_millis(20)
     } else {
         Duration::from_secs(2)
     }
