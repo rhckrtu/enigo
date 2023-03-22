@@ -29,6 +29,7 @@ fn unit_mouse_move_to() {
         for mouse_action in test_case {
             println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
             enigo.mouse_move_to(mouse_action.0 .0, mouse_action.0 .1);
+            thread::sleep(delay);
             let (x_res, y_res) = enigo.mouse_location();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
@@ -65,6 +66,7 @@ fn unit_mouse_move_rel() {
         for mouse_action in test_case {
             println!("Move {}, {}", mouse_action.0 .0, mouse_action.0 .1);
             enigo.mouse_move_relative(mouse_action.0 .0, mouse_action.0 .1);
+            thread::sleep(delay);
             let (x_res, y_res) = enigo.mouse_location();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
