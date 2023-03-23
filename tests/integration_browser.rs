@@ -1,4 +1,4 @@
-use enigo::{Key, KeyboardControllable};
+use enigo::{Key, KeyboardControllable, MouseButton, MouseControllable};
 use std::sync::mpsc::channel;
 
 mod common;
@@ -35,6 +35,8 @@ fn integration_browser_events() {
         enigo.key_down(Key::Control);
     } else {
         enigo.key_click(Key::F11);
+        enigo.mouse_move_to(200, 200);
+        enigo.mouse_click(MouseButton::Left);
     };
 
     // Wait for full screen animation
