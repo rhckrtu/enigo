@@ -14,14 +14,42 @@ fn integration_browser_events() {
     common::launch_browser(&rs);
     println!("Browser was launched");
 
-    enigo::Enigo::new(); //.key_click(Key::F11);
-                         // Full screen animation
+    let mut enigo = enigo::Enigo::new();
+
+    /*
+    if cfg!(target_os = "macos") {
+            println!("You are on macOS");
+            (1176, 885)
+        } else {
+            (1024, 768)
+        };
+     */
+
+    // Maximize Firefox
+    if cfg!(target_os = "macos") {
+        enigo.key_down(Key::Control);
+        enigo.key_down(Key::Meta);
+        enigo.key_down(Key::Layout('f'));
+        enigo.key_down(Key::Layout('f'));
+        enigo.key_down(Key::Meta);
+        enigo.key_down(Key::Control);
+    } else {
+        enigo.key_click(Key::F11);
+    };
+
+    // Wait for full screen animation
     std::thread::sleep(std::time::Duration::from_millis(3000));
-    /*  rs.recv_timeout(std::time::Duration::from_millis(500))
-            .unwrap(); // KeyDown("F11")
-        rs.recv_timeout(std::time::Duration::from_millis(500))
-            .unwrap(); // KeyUp("F11")
-    */
+
+    // Wait for the first timeout to ignore the first keys to maximize the browser
+    loop {
+        if rs
+            .recv_timeout(std::time::Duration::from_millis(500))
+            .is_err()
+        {
+            break;
+        }
+    }
+
     common::mouse::run(&rs);
     println!("Mouse test successfull");
     common::key::run(&rs);
