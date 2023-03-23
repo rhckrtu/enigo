@@ -61,10 +61,7 @@ jobs:
         uses: ./.github/actions/headless_display
 
 
-      - name: Do something before the integration tests
-        if: always() && runner.os == 'macOS'
-        run: cargo run --example fix_integration
-        
+      
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'desktop_before.jpg'
