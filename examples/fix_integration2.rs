@@ -15,7 +15,10 @@ fn main() {
     enigo.mouse_move_to(120, 10);
     thread::sleep(wait_time);
 
-    enigo.mouse_move_to(500, 500);
+    enigo.mouse_move_to(500, 300);
+    thread::sleep(wait_time);
+
+    enigo.mouse_click(MouseButton::Left);
     thread::sleep(wait_time);
 
     println!("mouse location: {:?}", enigo.mouse_location());
