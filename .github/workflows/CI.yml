@@ -65,23 +65,23 @@ jobs:
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'desktop_before.jpg'
-        if: runner.os == 'macOS'
+        if: runner.os == 'Windows'
 
       - name: Run integration tests
-        if: runner.os != 'Windows' # The integration tests only work on Linux right now
+        if: runner.os == 'Windows' # The integration tests only work on Linux right now
         run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
      
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'desktop_during.jpg'
-        if: always() && runner.os == 'macOS'
+        if: always() && runner.os == 'Windows'
 
       - name: Do something after the integration tests
-        if: always() && runner.os == 'macOS'
+        if: always() && runner.os == 'Windows'
         run: cargo run --example fix_integration2
 
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'desktop_after.jpg'
-        if: always() && runner.os == 'macOS'
+        if: always() && runner.os == 'Windows'
 
