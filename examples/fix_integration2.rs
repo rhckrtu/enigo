@@ -12,10 +12,7 @@ fn main() {
 
     thread::sleep(wait_time);
 
-    enigo.mouse_move_to(120, 10);
-    thread::sleep(wait_time);
-
-    enigo.mouse_move_to(500, 300);
+    enigo.mouse_move_to(10, 760);
     thread::sleep(wait_time);
 
     enigo.mouse_click(MouseButton::Left);
