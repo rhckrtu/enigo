@@ -59,6 +59,11 @@ jobs:
       - name: Setup headless display for integration tests
         if: runner.os == 'Linux' # The integration tests only work on Linux right now
         uses: ./.github/actions/headless_display
+
+
+      - name: Do something before the integration tests
+        if: always() && runner.os == 'macOS'
+        run: cargo run --example fix_integration
         
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
@@ -68,6 +73,15 @@ jobs:
       - name: Run integration tests
         if: runner.os != 'Windows' # The integration tests only work on Linux right now
         run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
+     
+      - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        with:
+          file-name: 'desktop_during.jpg'
+        if: always() && runner.os == 'macOS'
+
+      - name: Do something after the integration tests
+        if: always() && runner.os == 'macOS'
+        run: cargo run --example fix_integration2
 
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
