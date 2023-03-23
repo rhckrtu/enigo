@@ -66,6 +66,10 @@ jobs:
         with:
           file-name: 'desktop_before.jpg'
         if: runner.os == 'Windows'
+        
+      - name: Disable first start in Edge Browser
+        if: always() && runner.os == 'Windows'
+        run: reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /f /v "HideFirstRunExperience" /t REG_DWORD /d "1"
 
       - name: Run integration tests
         if: runner.os == 'Windows' # The integration tests only work on Linux right now
