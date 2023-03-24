@@ -33,18 +33,19 @@ jobs:
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
 
-      - name: Setup headless display for integration tests
-        if: runner.os == 'Linux' # The integration tests only work on Linux right now
+      - name: Setup headless display for integration tests on Linux
+        if: runner.os == 'Linux' # This step is only needed on Linux. The other OSs don't need to be set up
         uses: ./.github/actions/headless_display
 
-      - name: Start Firefox on Windows
-        if: always() && runner.os == 'Windows'
-        run: start firefox tests\index.html
-
-      - name: Start Firefox on Linux and macOS
-        if: always() && runner.os != 'Windows'
-        run: firefox ./tests/index.html
-
+      - name: Start Firefox
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            start firefox tests/index.html
+          else
+            firefox tests/index.html &
+          fi
+        
       - name: Check the code format
         run: cargo fmt -- --check
 
@@ -69,25 +70,24 @@ jobs:
         run: cargo build --examples --all-features
 
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        if: runner.os != 'Linux'
         with:
-          file-name: 'desktop_before.jpg'
-        if: runner.os == 'Windows'
+          file-name: '${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg'
         
       - name: Run integration tests
-        if: runner.os == 'Windows' # The integration tests only work on Linux right now
         run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
      
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        if: runner.os != 'Linux'
         with:
-          file-name: 'desktop_during.jpg'
-        if: always() && runner.os == 'Windows'
+          file-name: '${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg'
 
       - name: Do something after the integration tests
         if: always() && runner.os == 'Windows'
         run: cargo run --example fix_integration2
 
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        if: runner.os != 'Linux'
         with:
-          file-name: 'desktop_after.jpg'
-        if: always() && runner.os == 'Windows'
+          file-name: '${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg'
 
