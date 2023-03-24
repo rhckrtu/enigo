@@ -33,6 +33,18 @@ jobs:
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
 
+      - name: Setup headless display for integration tests
+        if: runner.os == 'Linux' # The integration tests only work on Linux right now
+        uses: ./.github/actions/headless_display
+
+      - name: Start Firefox on Windows
+        if: always() && runner.os == 'Windows'
+        run: start firefox tests\index.html
+
+      - name: Start Firefox on Linux and macOS
+        if: always() && runner.os != 'Windows'
+        run: firefox ./tests/index.html
+
       - name: Check the code format
         run: cargo fmt -- --check
 
@@ -56,21 +68,11 @@ jobs:
       - name: Build the examples with all features enabled
         run: cargo build --examples --all-features
 
-      - name: Setup headless display for integration tests
-        if: runner.os == 'Linux' # The integration tests only work on Linux right now
-        uses: ./.github/actions/headless_display
-
-
-      
       - uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'desktop_before.jpg'
         if: runner.os == 'Windows'
         
-      - name: Disable first start in Edge Browser
-        if: always() && runner.os == 'Windows'
-        run: reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /f /v "HideFirstRunExperience" /t REG_DWORD /d "1"
-
       - name: Run integration tests
         if: runner.os == 'Windows' # The integration tests only work on Linux right now
         run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture

@@ -11,8 +11,8 @@ fn integration_browser_events() {
     std::thread::spawn(move || common::launch_ws_server(tx));
     println!("WebSocket server thread was spawned");
     std::thread::sleep(std::time::Duration::from_millis(10000)); // Wait a few seconds to make sure the browser was started
-    common::launch_browser(&rs);
-    println!("Browser was launched");
+                                                                 //common::launch_browser(&rs);
+                                                                 //println!("Browser was launched");
 
     let mut enigo = enigo::Enigo::new();
 
