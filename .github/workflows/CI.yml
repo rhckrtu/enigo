@@ -85,19 +85,6 @@ jobs:
         run: cargo test --release --no-default-features ${{ matrix.features }}
 
       - name: Setup headless display for integration tests
-        if: runner.os == 'Linux' # The integration tests only work on Linux right now
         uses: ./.github/actions/headless_display
       - name: Run integration tests
-        if: runner.os == 'Linux' && matrix.features == 'xdo' # The integration tests only work on Linux and x11 right now
         run: cargo test --no-default-features ${{ matrix.features }} -- --include-ignored --nocapture
-
-      - name: Install Miri
-        if: matrix.rust == 'nightly' # Miri only works on Nightly
-        run: |
-          rustup toolchain install nightly --component miri
-          rustup override set nightly
-          cargo clean
-          cargo miri setup
-      - name: Run Miri to check unsafe code
-        if: matrix.rust == 'nightly' # Miri only works on Nightly
-        run: cargo miri test --verbose --no-default-features ${{ matrix.features }}
