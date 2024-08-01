@@ -6,13 +6,13 @@ runs:
   steps:
     - name: Install mesa3d on Windows
       if: runner.os == 'Windows'
-      uses: ssciwr/setup-mesa-dist-win@9068b6d8a2838cde12e5d36822a1556d782e1aae
+      uses: ssciwr/setup-mesa-dist-win@6657792673a5d162d5f244db991ba45b4b68989f
       with:
         version: '22.3.4'
         deployment-choice: '5'
     - name: Install Cygwin and xvfb on Windows (contained in xorg-server-extra)
       if: runner.os == 'Windows'
-      uses: cygwin/cygwin-install-action@db475590d56881c6cef7b3f96f6f3dd9532ea1f4
+      uses: cygwin/cygwin-install-action@006ad0b0946ca6d0a3ea2d4437677fa767392401
       with:
         packages: xorg-server xorg-server-extra
     - name:  Install xvfb on Linux and macOS
