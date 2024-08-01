@@ -90,6 +90,8 @@ tungstenite = "0.23"
 url = "2"
 webbrowser = "1.0"
 ron = "0.8"
+strum = "0.26"
+strum_macros = "0.26"
 
 [[example]]
 name = "serde"

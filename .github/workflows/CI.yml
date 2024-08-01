@@ -57,6 +57,20 @@ jobs:
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
 
+
+      - name: Setup headless display for integration tests on Linux
+        if: runner.os == 'Linux' # This step is only needed on Linux. The other OSs don't need to be set up
+        uses: ./.github/actions/headless_display
+
+      - name: Start Firefox
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            start firefox tests/index.html
+          else
+            firefox tests/index.html &
+          fi
+
       - name: Check the code format
         if: matrix.rust == 'nightly' # Avoid differences between the versions
         run: cargo fmt -- --check
@@ -78,13 +92,43 @@ jobs:
       - name: Build the examples in release mode
         run: cargo check --release --examples --no-default-features ${{ matrix.features }}
 
-      - name: Test the code
-        run: cargo test --no-default-features ${{ matrix.features }}
 
-      - name: Test the code in release mode
-        run: cargo test --release --no-default-features ${{ matrix.features }}
+      - name: Take screenshot
+        uses: ./.github/actions/screenshot
+        with:
+          step: before
+          rust: ${{ matrix.rust }}
+          platform: ${{ matrix.platform }}
 
-      - name: Setup headless display for integration tests
-        uses: ./.github/actions/headless_display
+
       - name: Run integration tests
-        run: cargo test --no-default-features ${{ matrix.features }} -- --include-ignored --nocapture
+        run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
+
+      - name: Take screenshot
+        if: always() 
+        uses: ./.github/actions/screenshot
+        with:
+          step: during
+          rust: ${{ matrix.rust }}
+          platform: ${{ matrix.platform }}
+
+      - name: Do something after the integration tests
+        if: always()
+        run: cargo run --example fix_integration2
+
+      - name: Take screenshot
+        if: always()
+        uses: ./.github/actions/screenshot
+        with:
+          step: after
+          rust: ${{ matrix.rust }}
+          platform: ${{ matrix.platform }}
+
+      # Delete duplicate artifacts
+      - uses: geekyeggo/delete-artifact@v2
+        if: always()
+        with:
+          name: |
+            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg
+            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg
+            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg

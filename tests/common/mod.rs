@@ -89,7 +89,7 @@ pub fn launch_ws_server(tx: Sender<BrowserEvent>) {
     }
 }
 
-pub fn launch_browser(rs: &Receiver<BrowserEvent>) {
+/*pub fn launch_browser(rs: &Receiver<BrowserEvent>) {
     let url = &format!(
         "file://{}/tests/index.html",
         std::env::current_dir().unwrap().to_str().unwrap()
@@ -122,3 +122,4 @@ pub fn launch_browser(rs: &Receiver<BrowserEvent>) {
     }*/
     println!("Done with launch function");
 }
+*/

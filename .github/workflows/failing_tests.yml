@@ -1,0 +1,58 @@
+name: failing_tests
+
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  additional_tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          - nightly
+          - "1.64.0"
+        platform:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/install_deps
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: rustfmt, clippy
+
+      - name: Setup headless display for integration tests
+        if: runner.os == 'Linux' # The integration tests only work on Linux right now
+        uses: ./.github/actions/headless_display
+
+      - name: Test the code
+        run: cargo test unit -- --test-threads=1 --include-ignored --nocapture
+      - name: Test the code with all features enabled
+        run: cargo test unit --all-features -- --test-threads=1 --include-ignored --nocapture
+
+      - name: Run integration tests
+        if: runner.os == 'Linux' # The integration tests only work on Linux right now
+        run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
+
+      - name: Install Miri
+        if: ${{ matrix.rust }} == 'nightly' # Miri only works on Nightly
+        run: |
+          rustup toolchain install nightly --component miri
+          rustup override set nightly
+          cargo clean
+          cargo miri setup
+      - name: Run Miri to check unsafe code
+        if: ${{ matrix.rust }} == 'nightly' # Miri only works on Nightly
+        run: cargo miri test --verbose --all-features 
