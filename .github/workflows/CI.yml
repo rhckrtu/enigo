@@ -103,7 +103,7 @@ jobs:
 
 
       - name: Run integration tests
-        run: cargo test integration --all-features -- --test-threads=1 --include-ignored --nocapture
+        run: cargo test integration --no-default-features ${{ matrix.features }} -- --test-threads=1 --include-ignored --nocapture
 
       - name: Take screenshot
         if: always() 
