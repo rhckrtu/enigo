@@ -25,7 +25,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
       run: DISPLAY=$DISPLAY import -window root -quality 90 ./'${{ inputs.platform }}_${{ inputs.rust }}_desktop_${{ inputs.step }}.jpg'
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: desktop_${{ inputs.step }}
         path: '${{ inputs.platform }}_${{ inputs.rust }}_desktop_${{ inputs.step }}.jpg'
