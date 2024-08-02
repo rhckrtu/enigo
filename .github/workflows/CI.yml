@@ -99,6 +99,7 @@ jobs:
           step: before
           rust: ${{ matrix.rust }}
           platform: ${{ matrix.platform }}
+          feature: ${{ matrix.features }}
 
 
       - name: Run integration tests
@@ -111,6 +112,7 @@ jobs:
           step: during
           rust: ${{ matrix.rust }}
           platform: ${{ matrix.platform }}
+          feature: ${{ matrix.features }}
 
       - name: Do something after the integration tests
         if: always()
@@ -123,6 +125,7 @@ jobs:
           step: after
           rust: ${{ matrix.rust }}
           platform: ${{ matrix.platform }}
+          feature: ${{ matrix.features }}
 
       # Delete duplicate artifacts
       - uses: geekyeggo/delete-artifact@v5
