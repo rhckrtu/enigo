@@ -1,13 +1,16 @@
-use crate::{Enigo, Key, KeyboardControllable};
+use crate::{
+    Direction::{Click, Press, Release},
+    Enigo, Key, Keyboard,Settings,
+};
 use std::thread;
 
 #[test]
 // Try entering various texts that were selected to test edge cases.
 // Because it is hard to test if they succeed,
 // we assume it worked as long as there was no panic
-fn unit_key_sequence() {
+fn unit_text() {
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     let sequences = vec![
         "",      /* Empty string */
@@ -16,7 +19,7 @@ fn unit_key_sequence() {
         "9",     // Number
         "%",     // Special character
         "𝕊",     // Special char which needs two u16s to be encoded
-        "❤️",     // Single emoji
+        "❤️",    // Single emoji
         "abcde", // Simple short character string (shorter than 20 chars)
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", /* Simple long character string (longer than 20 chars to test the restrictions of the macOS implementation) */
         "اَلْعَرَبِيَّةُ", // Short arabic string (meaning "Arabic")
@@ -41,38 +44,38 @@ fn unit_key_sequence() {
     ];
 
     for sequence in sequences {
-        enigo.key_sequence(sequence);
+        enigo.text(sequence).unwrap();
     }
 }
 
 #[ignore] // TODO: Currently ignored because not all chars are valid CStrings
 #[test]
-// Try entering all chars with the key_sequence function.
+// Try entering all chars with the text function.
 // Because it is hard to test if they succeed,
 // we assume it worked as long as there was no panic
-fn unit_key_sequence_all_utf16() {
+fn unit_text_all_utf16() {
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     for c in 0x0000..0x0010_FFFF {
         if let Some(character) = char::from_u32(c) {
             println!("{character}");
-            enigo.key_sequence(&character.to_string());
+            enigo.text(&character.to_string()).unwrap();
         };
     }
 }
 
 #[test]
 // Test all the keys, make sure none of them panic
-fn unit_key_click() {
+fn unit_key() {
     use strum::IntoEnumIterator;
 
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     for key in Key::iter() {
         println!("{key:?}");
-        enigo.key_down(key);
-        enigo.key_up(key);
-        enigo.key_click(key);
+        enigo.key(key, Press).unwrap();
+        enigo.key(key, Release).unwrap();
+        enigo.key(key, Click).unwrap();
     }
     // Key::Raw and Key::Layout are ignored. They are tested separately
 }
@@ -80,15 +83,15 @@ fn unit_key_click() {
 #[ignore]
 #[test]
 // Try entering all chars with Key::Layout and make sure none of them panic
-fn unit_key_layout_all_utf16() {
+fn unit_key_unicode_all_utf16() {
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     for c in 0x0000..=0x0010_FFFF {
         if let Some(character) = char::from_u32(c) {
             println!("{character}");
-            enigo.key_down(Key::Layout(character));
-            enigo.key_up(Key::Layout(character));
-            enigo.key_click(Key::Layout(character));
+            enigo.key(Key::Unicode(character), Press).unwrap();
+            enigo.key(Key::Unicode(character), Release).unwrap();
+            enigo.key(Key::Unicode(character), Click).unwrap();
         };
     }
 }
@@ -97,13 +100,13 @@ fn unit_key_layout_all_utf16() {
 #[test]
 // Try entering all possible raw keycodes with Key::Raw and make sure none of
 // them panic
-fn unit_key_raw_all_keycodes() {
+fn unit_key_other_all_keycodes() {
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
-    for raw_keycode in 0..=u16::MAX {
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
+    for raw_keycode in 0..=u32::MAX {
         println!("{raw_keycode}");
-        enigo.key_down(Key::Raw(raw_keycode));
-        enigo.key_up(Key::Raw(raw_keycode));
-        enigo.key_click(Key::Raw(raw_keycode));
+        enigo.key(Key::Other(raw_keycode), Press).unwrap();
+        enigo.key(Key::Other(raw_keycode), Release).unwrap();
+        enigo.key(Key::Other(raw_keycode), Click).unwrap();
     }
 }

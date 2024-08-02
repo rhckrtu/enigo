@@ -1,4 +1,10 @@
-use enigo::{Key, KeyboardControllable, MouseButton, MouseControllable};
+use enigo::{
+    Button,
+    Direction::{Click, Press, Release},
+    Enigo, Key, Keyboard, Mouse, Settings,
+    {Axis::Horizontal, Axis::Vertical},
+    {Coordinate::Abs, Coordinate::Rel},
+};
 use std::sync::mpsc::channel;
 
 mod common;
@@ -14,7 +20,7 @@ fn integration_browser_events() {
                                                                  //common::launch_browser(&rs);
                                                                  //println!("Browser was launched");
 
-    let mut enigo = enigo::Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     /*
     if cfg!(target_os = "macos") {
@@ -27,16 +33,16 @@ fn integration_browser_events() {
 
     // Maximize Firefox
     if cfg!(target_os = "macos") {
-        enigo.key_down(Key::Control);
-        enigo.key_down(Key::Meta);
-        enigo.key_down(Key::Layout('f'));
-        enigo.key_down(Key::Layout('f'));
-        enigo.key_down(Key::Meta);
-        enigo.key_down(Key::Control);
+        enigo.key(Key::Control, Press).unwrap();
+        enigo.key(Key::Meta, Press).unwrap();
+        enigo.key(Key::Unicode('f'), Press).unwrap();
+        enigo.key(Key::Unicode('f'), Press).unwrap();
+        enigo.key(Key::Meta, Press).unwrap();
+        enigo.key(Key::Control, Press).unwrap();
     } else {
-        enigo.key_click(Key::F11);
-        enigo.mouse_move_to(200, 200);
-        enigo.mouse_click(MouseButton::Left);
+        enigo.key(Key::F11, Click).unwrap();
+        enigo.move_mouse(200, 200, Abs).unwrap();
+        enigo.button(Button::Left, Click).unwrap();
     };
 
     // Wait for full screen animation

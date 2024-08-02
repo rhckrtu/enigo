@@ -1,30 +1,37 @@
-use enigo::{Enigo, Key, KeyboardControllable, MouseButton, MouseControllable};
+use enigo::{
+    Button,
+    Direction::{Click, Press, Release},
+    Enigo, Key, Keyboard, Mouse, Settings,
+    {Coordinate::Abs},
+};
+
 use std::thread;
 use std::time::Duration;
 
 fn main() {
+    env_logger::init();
     let wait_time = Duration::from_secs(2);
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     thread::sleep(Duration::from_secs(4));
-    println!("screen dimensions: {:?}", enigo.main_display_size());
-    println!("mouse location: {:?}", enigo.mouse_location());
+    println!("screen dimensions: {:?}", enigo.main_display().unwrap());
+    println!("mouse location: {:?}", enigo.location().unwrap());
 
     thread::sleep(wait_time);
 
-    enigo.mouse_move_to(10, 760);
+    enigo.move_mouse(10, 760, Abs).unwrap();
     thread::sleep(wait_time);
 
-    enigo.mouse_click(MouseButton::Left);
+    enigo.button(Button::Left, Click).unwrap();
     thread::sleep(wait_time);
 
-    enigo.key_down(Key::Control);
-    enigo.key_down(Key::Layout('f'));
+    enigo.key(Key::Control, Press).unwrap();
+    enigo.key(Key::Unicode('f'), Press).unwrap();
     thread::sleep(Duration::from_millis(10));
-    enigo.key_up(Key::Layout('f'));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Unicode('f'), Release).unwrap();
+    enigo.key(Key::Control, Release).unwrap();
 
-    enigo.key_sequence("Search for something!");
+    enigo.text("Search for something!").unwrap();
 
-    println!("mouse location: {:?}", enigo.mouse_location());
+    println!("mouse location: {:?}", enigo.location().unwrap());
 }

@@ -1,6 +1,5 @@
 use std::time::Duration;
 
-
 /// Module containing all the tests related to the `Keyboard` trait
 /// that are platform independent
 mod keyboard;

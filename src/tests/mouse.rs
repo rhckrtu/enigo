@@ -1,17 +1,22 @@
-use crate::{Enigo, MouseButton, MouseControllable};
+use crate::{
+    Enigo, Button, Mouse,
+    Direction::{Press, Release, Click},
+    {Axis::Horizontal, Axis::Vertical},Settings,
+    {Coordinate::Abs, Coordinate::Rel},
+};
 use std::thread;
 
 use super::is_ci;
 
 #[test]
-// Test the mouse_move_to function and check it with the mouse_location function
-fn unit_mouse_move_to() {
+// Test the move_mouse function and check it with the mouse_location function
+fn unit_move_mouse_to() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
-    let display_size = enigo.main_display_size();
+    let display_size = enigo.main_display().unwrap();
     println!("Display size {} x {}", display_size.0, display_size.1);
 
     // Make a square of 100 pixels starting at the top left corner of the screen and
@@ -28,9 +33,9 @@ fn unit_mouse_move_to() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.mouse_move_to(mouse_action.0 .0, mouse_action.0 .1);
+            enigo.move_mouse(mouse_action.0 .0, mouse_action.0 .1, Abs);
             thread::sleep(delay);
-            let (x_res, y_res) = enigo.mouse_location();
+            let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
             thread::sleep(delay);
@@ -39,16 +44,16 @@ fn unit_mouse_move_to() {
 }
 
 #[test]
-// Test the mouse_move_relative function and check it with the mouse_location
+// Test the move_mouse function and check it with the mouse_location
 // function
-fn unit_mouse_move_rel() {
+fn unit_move_mouse_rel() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
-    let mut enigo = Enigo::new();
-    enigo.mouse_move_to(0, 0); // Move to absolute start position
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
+    enigo.move_mouse(0, 0, Abs); // Move to absolute start position
 
-    let display_size = enigo.main_display_size();
+    let display_size = enigo.main_display().unwrap();
     println!("Display size {} x {}", display_size.0, display_size.1);
 
     // Make a square of 100 pixels starting at the top left corner of the screen and
@@ -65,9 +70,9 @@ fn unit_mouse_move_rel() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.mouse_move_relative(mouse_action.0 .0, mouse_action.0 .1);
+            enigo.move_mouse(mouse_action.0 .0, mouse_action.0 .1, Rel);
             thread::sleep(delay);
-            let (x_res, y_res) = enigo.mouse_location();
+            let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
             thread::sleep(delay);
@@ -77,14 +82,14 @@ fn unit_mouse_move_rel() {
 
 #[ignore]
 #[test]
-// Test the mouse_move_to function and check it with the mouse_location function
-fn unit_mouse_move_to_boundaries() {
+// Test the move_mouse function and check it with the mouse_location function
+fn unit_move_mouse_to_boundaries() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
-    let display_size = enigo.main_display_size();
+    let display_size = enigo.main_display().unwrap();
     println!("Display size {} x {}", display_size.0, display_size.1);
 
     // Move the mouse outside of the boundaries of the screen
@@ -116,8 +121,8 @@ fn unit_mouse_move_to_boundaries() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.mouse_move_to(mouse_action.0 .0, mouse_action.0 .1);
-            let (x_res, y_res) = enigo.mouse_location();
+            enigo.move_mouse(mouse_action.0 .0, mouse_action.0 .1, Abs);
+            let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
             thread::sleep(delay);
@@ -127,16 +132,16 @@ fn unit_mouse_move_to_boundaries() {
 
 #[ignore]
 #[test]
-// Test the mouse_move_relative function and check it with the mouse_location
+// Test the move_mouse function and check it with the mouse_location
 // function
-fn unit_mouse_move_rel_boundaries() {
+fn unit_move_mouse_rel_boundaries() {
     let delay = super::get_delay();
 
     thread::sleep(delay);
-    let mut enigo = Enigo::new();
-    enigo.mouse_move_to(0, 0); // Move to absolute start position
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
+    enigo.move_mouse(0, 0, Abs); // Move to absolute start position
 
-    let display_size = enigo.main_display_size();
+    let display_size = enigo.main_display().unwrap();
     println!("Display size {} x {}", display_size.0, display_size.1);
 
     // Move the mouse outside of the boundaries of the screen
@@ -170,8 +175,10 @@ fn unit_mouse_move_rel_boundaries() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.mouse_move_relative(mouse_action.0 .0, mouse_action.0 .1);
-            let (x_res, y_res) = enigo.mouse_location();
+            enigo
+                .move_mouse(mouse_action.0 .0, mouse_action.0 .1, Rel)
+                .unwrap();
+            let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
             thread::sleep(delay);
@@ -180,13 +187,13 @@ fn unit_mouse_move_rel_boundaries() {
 }
 
 #[test]
-// Test the main_display_size function
+// Test the main_display function
 // The CI's virtual display has a dimension of 1024x768 (except on macOS where
 // it is 1176x885). If the test is ran outside of the CI, we don't know the
 // displays dimensions so we just make sure it is greater than 0x0.
 fn unit_display_size() {
-    let enigo = Enigo::new();
-    let display_size = enigo.main_display_size();
+    let enigo = Enigo::new(&Settings::default()).unwrap();
+    let display_size = enigo.main_display().unwrap();
     println!("Main display size: {}x{}", display_size.0, display_size.1);
     if !is_ci() {
         assert!(display_size.0 > 0);
@@ -211,12 +218,12 @@ fn unit_button_click() {
     use strum::IntoEnumIterator;
 
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
-    for button in MouseButton::iter() {
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
+    for button in Button::iter() {
         println!("{button:?}");
-        enigo.mouse_down(button);
-        enigo.mouse_up(button);
-        enigo.mouse_click(button);
+        enigo.button(button, Press).unwrap();
+        enigo.button(button, Release).unwrap();
+        enigo.button(button, Click).unwrap();
     }
 }
 
@@ -226,10 +233,10 @@ fn unit_10th_click() {
     use strum::IntoEnumIterator;
 
     thread::sleep(super::get_delay());
-    let mut enigo = Enigo::new();
-    for button in MouseButton::iter() {
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
+    for button in Button::iter() {
         for _ in 0..10 {
-            enigo.mouse_click(button);
+            enigo.button(button, Click).unwrap();
         }
     }
 }
@@ -238,19 +245,19 @@ fn unit_10th_click() {
 // Click each mouse button ten times, make sure none of them panic
 fn unit_scroll() {
     let delay = super::get_delay();
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     let test_cases = vec![0, 1, 5, 100, 57899, -57899, -0, -1, -5, -100];
 
     for length in &test_cases {
         thread::sleep(delay);
         println!("scroll x{length}");
-        enigo.mouse_scroll_x(*length);
+        enigo.scroll(*length, Horizontal).unwrap();
     }
     for length in &test_cases {
         thread::sleep(delay);
         println!("scroll x{length}");
-        enigo.mouse_scroll_y(*length);
+        enigo.scroll(*length, Vertical).unwrap();
     }
 }
 
@@ -258,11 +265,11 @@ fn unit_scroll() {
 // Press down and drag the mouse
 fn unit_mouse_drag() {
     let delay = super::get_delay();
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
-    enigo.mouse_move_to(500, 200);
-    enigo.mouse_down(MouseButton::Left);
-    enigo.mouse_move_relative(100, 100);
+    enigo.move_mouse(500, 200, Abs).unwrap();
+    enigo.button(Button::Left, Press).unwrap();
+    enigo.move_mouse(100, 100, Rel).unwrap();
     thread::sleep(delay);
-    enigo.mouse_up(MouseButton::Left);
+    enigo.button(Button::Left, Release).unwrap();
 }
