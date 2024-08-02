@@ -32,3 +32,4 @@ runs:
       with:
         name: desktop_${{ inputs.step }}
         path: '${{ inputs.platform }}_${{ inputs.rust }}_desktop_${{ inputs.step }}_${{ inputs.feature }}.jpg'
+        overwrite: true
