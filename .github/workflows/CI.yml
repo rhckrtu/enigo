@@ -59,7 +59,7 @@ jobs:
 
 
       - name: Setup headless display for integration tests on Linux
-        if: runner.os == 'Linux' # This step is only needed on Linux. The other OSs don't need to be set up
+        if: runner.os != 'Windows' # This step is only needed on Linux and macOS. The other OSs don't need to be set up
         uses: ./.github/actions/headless_display
 
       - name: Start Firefox
