@@ -1,7 +1,8 @@
 use crate::{
-    Enigo, Button, Mouse,
-    Direction::{Press, Release, Click},
-    {Axis::Horizontal, Axis::Vertical},Settings,
+    Button,
+    Direction::{Click, Press, Release},
+    Enigo, Mouse, Settings,
+    {Axis::Horizontal, Axis::Vertical},
     {Coordinate::Abs, Coordinate::Rel},
 };
 use std::thread;

@@ -1,8 +1,8 @@
 use enigo::{
     Button,
+    Coordinate::Abs,
     Direction::{Click, Press, Release},
     Enigo, Key, Keyboard, Mouse, Settings,
-    {Coordinate::Abs},
 };
 
 use std::thread;

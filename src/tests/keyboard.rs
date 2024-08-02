@@ -1,6 +1,6 @@
 use crate::{
     Direction::{Click, Press, Release},
-    Enigo, Key, Keyboard,Settings,
+    Enigo, Key, Keyboard, Settings,
 };
 use std::thread;
 
