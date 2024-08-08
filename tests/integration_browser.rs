@@ -58,9 +58,9 @@ fn integration_browser_events() {
         }
     }
 
-     common::mouse::run(&mut enigo,&rs);
-     println!("Mouse test successfull");
-    common::key::run(&mut enigo,&rs);
+    common::mouse::run(&mut enigo, &rs);
+    println!("Mouse test successfull");
+    common::key::run(&mut enigo, &rs);
     println!("Keyboard test successfull");
     println!("All tests successfull");
 }

@@ -34,7 +34,9 @@ fn unit_move_mouse_to() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.move_mouse(mouse_action.0 .0, mouse_action.0 .1, Abs).unwrap();
+            enigo
+                .move_mouse(mouse_action.0 .0, mouse_action.0 .1, Abs)
+                .unwrap();
             thread::sleep(delay);
             let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
@@ -71,7 +73,9 @@ fn unit_move_mouse_rel() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.move_mouse(mouse_action.0 .0, mouse_action.0 .1, Rel).unwrap();
+            enigo
+                .move_mouse(mouse_action.0 .0, mouse_action.0 .1, Rel)
+                .unwrap();
             thread::sleep(delay);
             let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
@@ -122,7 +126,9 @@ fn unit_move_mouse_to_boundaries() {
     for test_case in test_cases {
         for mouse_action in test_case {
             println!("Move to {}, {}", mouse_action.0 .0, mouse_action.0 .1);
-            enigo.move_mouse(mouse_action.0 .0, mouse_action.0 .1, Abs).unwrap();
+            enigo
+                .move_mouse(mouse_action.0 .0, mouse_action.0 .1, Abs)
+                .unwrap();
             let (x_res, y_res) = enigo.location().unwrap();
             assert_eq!(mouse_action.1 .0, x_res);
             assert_eq!(mouse_action.1 .1, y_res);
