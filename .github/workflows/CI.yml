@@ -58,18 +58,6 @@ jobs:
           components: rustfmt, clippy
 
 
-      - name: Setup headless display for integration tests on Linux
-        if: runner.os != 'Windows' # This step is only needed on Linux and macOS. The other OSs don't need to be set up
-        uses: ./.github/actions/headless_display
-
-      - name: Start Firefox
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            start firefox tests/index.html
-          else
-            firefox tests/index.html &
-          fi
 
       - name: Check the code format
         if: matrix.rust == 'nightly' # Avoid differences between the versions
@@ -92,6 +80,18 @@ jobs:
       - name: Build the examples in release mode
         run: cargo check --release --examples --no-default-features ${{ matrix.features }}
 
+      - name: Setup headless display for integration tests on Linux
+        if: runner.os != 'Windows' # This step is only needed on Linux and macOS. The other OSs don't need to be set up
+        uses: ./.github/actions/headless_display
+
+      - name: Start Firefox
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            start firefox tests/index.html
+          else
+            firefox tests/index.html &
+          fi
 
       - name: Take screenshot
         uses: ./.github/actions/screenshot
@@ -100,7 +100,6 @@ jobs:
           rust: ${{ matrix.rust }}
           platform: ${{ matrix.platform }}
           feature: ${{ matrix.features }}
-
 
       - name: Run integration tests
         run: cargo test integration --no-default-features ${{ matrix.features }} -- --test-threads=1 --include-ignored --nocapture

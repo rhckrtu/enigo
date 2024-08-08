@@ -7,16 +7,15 @@ use enigo::{
 
 use super::BrowserEvent;
 
-pub fn run(recv: &Receiver<BrowserEvent>) {
-    press(recv, Key::F1);
-    press(recv, Key::Control);
-    press(recv, Key::Backspace);
-    // press(recv, Key::PageUp); Failing on Windows
+pub fn run(enigo:&mut Enigo,recv: &Receiver<BrowserEvent>) {
+    press(enigo,recv, Key::F1);
+    press(enigo,recv, Key::Control);
+    press(enigo,recv, Key::Backspace);
+    // press(enigo, recv, Key::PageUp); Failing on Windows
 }
 
-fn press(recv: &Receiver<BrowserEvent>, key: Key) {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
-
+fn press(enigo: &mut Enigo,recv: &Receiver<BrowserEvent>, key: Key) {
+    
     enigo.key(key, Press).unwrap();
     let ev = recv
         .recv_timeout(std::time::Duration::from_millis(5000))
