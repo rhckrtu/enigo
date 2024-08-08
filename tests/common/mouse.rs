@@ -6,7 +6,7 @@ use super::BrowserEvent;
 
 const ERROR: i32 = 2;
 
-pub fn run(recv: &Receiver<BrowserEvent>) {
+pub fn run(enigo: &mut Enigo, recv: &Receiver<BrowserEvent>) {
     println!("Move mouse");
     set(recv, (100, 100));
     println!("Move mouse");
