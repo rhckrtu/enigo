@@ -2,17 +2,15 @@ use enigo::{
     Axis::{Horizontal, Vertical},
     Coordinate::{Abs, Rel},
     Direction::{Click, Press, Release},
-    Enigo, Key, Keyboard, Mouse, Settings,
+    Key, Keyboard, Mouse, Settings,
 };
 
 mod common;
+use common::enigo_test::EnigoTest as Enigo;
 
 #[test]
 fn integration_browser_events() {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
-
-    let rs = common::setup_integration_tests(&mut enigo);
-    let mut enigo = common::enigo_test::EnigoTest::new(enigo, rs); // Wrap the Enigo struct in EnigoTest to test the functions
+    let mut enigo = Enigo::new(Settings::default());
 
     enigo.maximize_firefox();
 

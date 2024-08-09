@@ -7,9 +7,7 @@ mod websocket;
 
 use browser_events::BrowserEvent;
 
-pub fn setup_integration_tests(
-    enigo: &mut enigo::Enigo,
-) -> std::sync::mpsc::Receiver<BrowserEvent> {
+pub fn setup_integration_tests() -> std::sync::mpsc::Receiver<BrowserEvent> {
     env_logger::init();
     let _ = &*firefox::FIREFOX_INSTANCE; // Launch Firefox
     let (tx, rs) = channel::<BrowserEvent>();

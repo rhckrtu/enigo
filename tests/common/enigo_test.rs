@@ -1,11 +1,10 @@
 use std::sync::mpsc::Receiver;
 
 use enigo::{
-    Axis, Button, Coordinate,
-    Coordinate::Abs,
-    Direction,
-    Direction::{Click, Press, Release},
-    Enigo, Key, Keyboard, Mouse,
+    Axis, Button,
+    Coordinate::{self, Abs},
+    Direction::{self, Click, Press, Release},
+    Enigo, Key, Keyboard, Mouse, Settings,
 };
 
 use super::browser_events::BrowserEvent;
@@ -19,7 +18,9 @@ pub struct EnigoTest {
 }
 
 impl EnigoTest {
-    pub fn new(enigo: Enigo, rs: Receiver<BrowserEvent>) -> Self {
+    pub fn new(settings: Settings) -> Self {
+        let enigo = Enigo::new(&settings).unwrap();
+        let rs = super::setup_integration_tests();
         Self { enigo, rs }
     }
 
