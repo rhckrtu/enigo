@@ -3,9 +3,8 @@ use std::sync::mpsc::channel;
 use log::debug;
 
 mod browser_events;
+pub mod enigo_test;
 mod firefox;
-pub mod key;
-pub mod mouse;
 mod websocket;
 
 use browser_events::BrowserEvent;
@@ -23,13 +22,12 @@ pub fn setup_integration_tests(
     rs
 }
 
-fn maximize_firefox(enigo: &mut enigo::Enigo, rs: &std::sync::mpsc::Receiver<BrowserEvent>) {
+fn maximize_firefox(enigo: &mut crate::Enigo, rs: &std::sync::mpsc::Receiver<BrowserEvent>) {
     use enigo::{
         Button,
+        Coordinate::Abs,
         Direction::{Click, Press, Release},
-        Enigo, Key, Keyboard, Mouse, Settings,
-        {Axis::Horizontal, Axis::Vertical},
-        {Coordinate::Abs, Coordinate::Rel},
+        Key, Keyboard, Mouse,
     };
 
     // Maximize Firefox
@@ -37,9 +35,9 @@ fn maximize_firefox(enigo: &mut enigo::Enigo, rs: &std::sync::mpsc::Receiver<Bro
         enigo.key(Key::Control, Press).unwrap();
         enigo.key(Key::Meta, Press).unwrap();
         enigo.key(Key::Unicode('f'), Press).unwrap();
-        enigo.key(Key::Unicode('f'), Press).unwrap();
-        enigo.key(Key::Meta, Press).unwrap();
-        enigo.key(Key::Control, Press).unwrap();
+        enigo.key(Key::Unicode('f'), Release).unwrap();
+        enigo.key(Key::Meta, Release).unwrap();
+        enigo.key(Key::Control, Release).unwrap();
     } else {
         enigo.key(Key::F11, Click).unwrap();
         enigo.move_mouse(200, 200, Abs).unwrap();

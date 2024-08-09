@@ -8,7 +8,7 @@ pub enum BrowserEvent {
     KeyUp(String),
     MouseDown(String),
     MouseUp(String),
-    MouseMove(((i32, i32), (i32, i32))),
+    MouseMove(((i32, i32), (i32, i32))), // (relative, absolute)
     MouseScroll((i32, i32)),
     Open,
     Close,

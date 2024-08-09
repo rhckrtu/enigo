@@ -93,6 +93,7 @@ webbrowser = "1.0"
 ron = "0.8"
 strum = "0.26"
 strum_macros = "0.26"
+winit = "0.28"
 
 [[example]]
 name = "serde"
