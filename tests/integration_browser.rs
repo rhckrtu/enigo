@@ -32,3 +32,24 @@ fn integration_browser_events() {
     enigo.scroll(1, Horizontal).unwrap();
     enigo.scroll(1, Vertical).unwrap();
 }
+
+#[test]
+fn integration_ws() {
+    use std::sync::mpsc::channel;
+
+    let (tx, rs) = channel::<common::browser_events::BrowserEvent>();
+    println!("Created channel");
+    std::thread::spawn(move || common::websocket::launch_ws_server(tx));
+    println!("WebSocket server thread was spawned");
+
+    for _ in 0..150 {
+        match rs.recv() {
+            Ok(event) => {
+                println!("Received BrowserEvent: {event:?}");
+            }
+            Err(err) => {
+                println!("Received error: {err:?}");
+            }
+        }
+    }
+}
