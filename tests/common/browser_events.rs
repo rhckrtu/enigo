@@ -1,4 +1,3 @@
-use log::debug;
 use serde::{Deserialize, Serialize};
 use tungstenite::Message;
 
@@ -27,16 +26,16 @@ impl TryFrom<Message> for BrowserEvent {
     fn try_from(message: Message) -> Result<Self, Self::Error> {
         match message {
             Message::Close(_) => {
-                debug!("Message::Close received");
+                println!("Message::Close received");
                 Ok(BrowserEvent::Close)
             }
             Message::Text(msg) => {
-                debug!("Message::Text received");
-                debug!("msg: {:?}", msg);
+                println!("Message::Text received");
+                println!("msg: {:?}", msg);
                 ron::from_str(&msg).unwrap()
             }
             _ => {
-                debug!("Other Message received");
+                println!("Other Message received");
                 Err(BrowserEventError::UnknownMessageType)
             }
         }

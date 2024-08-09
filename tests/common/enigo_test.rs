@@ -1,9 +1,9 @@
 use std::sync::mpsc::Receiver;
 
-use log::debug;
-
 use enigo::{
-    Axis, Coordinate, Direction,
+    Axis, Button, Coordinate,
+    Coordinate::Abs,
+    Direction,
     Direction::{Click, Press, Release},
     Enigo, Key, Keyboard, Mouse,
 };
@@ -21,6 +21,43 @@ pub struct EnigoTest {
 impl EnigoTest {
     pub fn new(enigo: Enigo, rs: Receiver<BrowserEvent>) -> Self {
         Self { enigo, rs }
+    }
+
+    // Print all the BrowserEvents until receiving the first timeout
+    pub fn print_events(&self) {
+        loop {
+            match self.rs.recv_timeout(std::time::Duration::from_millis(500)) {
+                Ok(event) => {
+                    println!("Received BrowserEvent: {event:?}");
+                }
+                Err(err) => {
+                    println!("Received error: {err:?}");
+                    break;
+                }
+            }
+        }
+    }
+
+    // Maximize Firefox by pressing keys or moving the mouse
+    pub fn maximize_firefox(&mut self) {
+        self.print_events();
+
+        // Maximize Firefox
+        if cfg!(target_os = "macos") {
+            self.key(Key::Control, Press).unwrap();
+            self.key(Key::Meta, Press).unwrap();
+            self.key(Key::Unicode('f'), Press).unwrap();
+            self.key(Key::Unicode('f'), Release).unwrap();
+            self.key(Key::Meta, Release).unwrap();
+            self.key(Key::Control, Release).unwrap();
+        } else {
+            self.key(Key::F11, Click).unwrap();
+            self.move_mouse(200, 200, Abs).unwrap();
+            self.button(Button::Left, Click).unwrap();
+        };
+
+        // Wait for full screen animation
+        std::thread::sleep(std::time::Duration::from_millis(3000));
     }
 }
 
@@ -53,7 +90,7 @@ impl Keyboard for EnigoTest {
                 panic!("BrowserEvent was not a KeyUp: {ev:?}");
             }
         }
-        debug!("enigo.key() was a success");
+        println!("enigo.key() was a success");
         res
     }
 
@@ -87,18 +124,18 @@ impl Mouse for EnigoTest {
                 panic!("BrowserEvent was not a MouseUp: {ev:?}");
             }
         }
-        debug!("enigo.button() was a success");
+        println!("enigo.button() was a success");
         res
     }
 
     fn move_mouse(&mut self, x: i32, y: i32, coordinate: Coordinate) -> enigo::InputResult<()> {
         let res = self.enigo.move_mouse(x, y, coordinate);
-        debug!("Executed Enigo");
+        println!("Executed enigo.move_mouse");
         let ev = self
             .rs
             .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
             .unwrap();
-        debug!("Done waiting");
+        println!("Done waiting");
 
         let mouse_position = if let BrowserEvent::MouseMove(pos) = ev {
             match coordinate {
@@ -111,18 +148,18 @@ impl Mouse for EnigoTest {
 
         assert!((x - mouse_position.0).abs() <= DELTA);
         assert!((y - mouse_position.1).abs() <= DELTA);
-        debug!("enigo.move_mouse() was a success");
+        println!("enigo.move_mouse() was a success");
         res
     }
 
     fn scroll(&mut self, length: i32, axis: Axis) -> enigo::InputResult<()> {
         let res = self.enigo.scroll(length, axis);
-        debug!("Executed Enigo");
+        println!("Executed Enigo");
         let ev = self
             .rs
             .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
             .unwrap();
-        debug!("Done waiting");
+        println!("Done waiting");
 
         let mouse_scroll = if let BrowserEvent::MouseScroll(length) = ev {
             match axis {
@@ -134,7 +171,7 @@ impl Mouse for EnigoTest {
         };
 
         assert!(length == mouse_scroll);
-        debug!("enigo.scroll() was a success");
+        println!("enigo.scroll() was a success");
         res
     }
 
