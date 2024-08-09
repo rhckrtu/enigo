@@ -50,7 +50,7 @@
         document.addEventListener('mousedown', (event) => handleEvent('MouseDown', `(${event.button})`));
         document.addEventListener('mouseup', (event) => handleEvent('MouseUp', `(${event.button})`));
         document.addEventListener('mousemove', (event) => handleEvent('MouseMove', `((${event.movementX},${event.movementY}),(${event.screenX},${event.screenY}))`));
-        document.addEventListener('mousewheel', (event) => handleEvent('MouseScroll', `(${event.deltaX},${event.deltaY})`));
+        document.addEventListener('wheel', (event) => handleEvent('MouseScroll', `(${event.deltaX},${event.deltaY})`));
     </script>
 </body>
 
