@@ -28,54 +28,29 @@
     <p id="output1">Test did not start. Do you have JavaScript enabled?</p>
     <script>
         const ws = new WebSocket('ws://localhost:26541');
-        ws.addEventListener('open', (event) => {
-            const message = `Open`;
+
+        // Helper function to handle events
+        const handleEvent = (eventType, data = '') => {
+            const message = `${eventType}${data}`;
             console.log(message);
+            document.getElementById(eventType).checked = true;
             ws.send(message);
+        };
+
+        document.addEventListener('open', (event) => {
+            handleEvent('Open', event);
             document.getElementById('output1').innerHTML = 'Test was started. Do not close the page.';
         });
-        ws.addEventListener('close', (event) => {
-            const message = `Close`;
-            console.log(message);
-            ws.send(message);
+        document.addEventListener('close', (event) => {
+            handleEvent('Close', event);
             document.getElementById('output1').innerHTML = 'Test concluded. Close this page.';
         });
-        document.addEventListener('keydown', (event) => {
-            const message = `KeyDown(${event.key})`;
-            console.log(message);
-            document.getElementById("KeyDown").checked = true;
-            ws.send(message);
-        });
-        document.addEventListener('keyup', (event) => {
-            const message = `KeyUp(${event.key})`;
-            console.log(message);
-            document.getElementById("KeyUp").checked = true;
-            ws.send(message);
-        });
-        document.addEventListener('mousedown', (event) => {
-            const message = `MouseDown(${event.button})`;
-            console.log(message);
-            document.getElementById("MouseDown").checked = true;
-            ws.send(message);
-        });
-        document.addEventListener('mouseup', (event) => {
-            const message = `MouseUp(${event.button})`;
-            console.log(message);
-            document.getElementById("MouseUp").checked = true;
-            ws.send(message);
-        });
-        document.addEventListener('mousemove', (event) => {
-            const message = `MouseMove((${event.movementX},${event.movementY}),(${event.screenX},${event.screenY}))`;
-            console.log(message);
-            document.getElementById("MouseMove").checked = true;
-            ws.send(message);
-        });
-        document.addEventListener('mousewheel', (event) => {
-            const message = `MouseScroll(${event.deltaX},${event.deltaY})`;
-            console.log(message);
-            document.getElementById("MouseScroll").checked = true;
-            ws.send(message);
-        });
+        document.addEventListener('keydown', (event) => handleEvent('KeyDown', `(${event.key})`));
+        document.addEventListener('keyup', (event) => handleEvent('KeyUp', `(${event.key})`));
+        document.addEventListener('mousedown', (event) => handleEvent('MouseDown', `(${event.button})`));
+        document.addEventListener('mouseup', (event) => handleEvent('MouseUp', `(${event.button})`));
+        document.addEventListener('mousemove', (event) => handleEvent('MouseMove', `((${event.movementX},${event.movementY}),(${event.screenX},${event.screenY}))`));
+        document.addEventListener('mousewheel', (event) => handleEvent('MouseScroll', `(${event.deltaX},${event.deltaY})`));
     </script>
 </body>
 
