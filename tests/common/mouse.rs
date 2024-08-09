@@ -71,7 +71,7 @@ fn scroll(recv: &Receiver<BrowserEvent>) {
         .recv_timeout(std::time::Duration::from_millis(5000))
         .unwrap();
     debug!("Done waiting");
-    if let BrowserEvent::MouseWheel(length) = ev {
+    if let BrowserEvent::MouseScroll(length) = ev {
         debug!("Scroll success");
         assert!(length.0 > 0);
         assert!(length.1 == 0);
@@ -85,7 +85,7 @@ fn scroll(recv: &Receiver<BrowserEvent>) {
         .recv_timeout(std::time::Duration::from_millis(5000))
         .unwrap();
     debug!("Done waiting");
-    if let BrowserEvent::MouseWheel(length) = ev {
+    if let BrowserEvent::MouseScroll(length) = ev {
         debug!("Scroll success");
         assert!(length.0 == 0);
         assert!(length.1 > 0);
