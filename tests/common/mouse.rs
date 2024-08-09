@@ -4,7 +4,7 @@ use log::debug;
 
 use enigo::{Axis, Coordinate, Enigo, Mouse, Settings};
 
-use super::BrowserEvent;
+use super::browser_events::BrowserEvent;
 
 const ERROR: i32 = 2;
 

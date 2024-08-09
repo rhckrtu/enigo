@@ -7,7 +7,7 @@ use enigo::{
     Enigo, Key, Keyboard, Settings,
 };
 
-use super::BrowserEvent;
+use super::browser_events::BrowserEvent;
 
 pub fn run(enigo: &mut Enigo, recv: &Receiver<BrowserEvent>) {
     press(enigo, recv, Key::F1);
