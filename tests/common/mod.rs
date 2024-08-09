@@ -81,7 +81,7 @@ pub fn launch_ws_server(tx: Sender<BrowserEvent>) {
     match listener.accept() {
         Ok((stream, addr)) => {
             println!("New connection was made from {addr:?}");
-            std::thread::spawn(move || handle_connection(stream, &tx));
+            handle_connection(stream, &tx);
         }
         Err(e) => {
             println!("Connection failed: {e:?}");
