@@ -1,6 +1,7 @@
 use std::net::{TcpListener, TcpStream};
 use std::sync::mpsc::{Receiver, Sender};
 
+use log::debug;
 use tungstenite::{accept, Message};
 
 pub mod key;
@@ -18,25 +19,100 @@ pub enum BrowserEvent {
     Close,
 }
 
+#[derive(Debug)]
+pub enum BrowserEventError {
+    UnknownMessageType,
+    InvalidMessageFormat,
+    ParseError,
+}
+
+impl TryFrom<Message> for BrowserEvent {
+    type Error = BrowserEventError;
+
+    fn try_from(message: Message) -> Result<Self, Self::Error> {
+        match message {
+            Message::Close(_) => {
+                debug!("Message::Close received");
+                Ok(BrowserEvent::Close)
+            }
+            Message::Text(msg) => {
+                debug!("Message::Text received");
+                debug!("msg: {:?}", msg);
+                let (key, data) = msg
+                    .split_once(':')
+                    .ok_or(BrowserEventError::InvalidMessageFormat)?;
+                match key {
+                    "open" => Ok(BrowserEvent::Open),
+                    "close" => Ok(BrowserEvent::Close),
+                    "keydown" => Ok(BrowserEvent::KeyDown(data.to_string())),
+                    "keyup" => Ok(BrowserEvent::KeyUp(data.to_string())),
+                    "mousedown" => Ok(BrowserEvent::MouseDown(data.to_string())),
+                    "mouseup" => Ok(BrowserEvent::MouseUp(data.to_string())),
+                    "mousemove" => {
+                        // format is relx,rely|absx,absy
+                        let (rel, abs) = data
+                            .split_once('|')
+                            .ok_or(BrowserEventError::InvalidMessageFormat)?;
+                        let (relx, rely) = rel
+                            .split_once(',')
+                            .ok_or(BrowserEventError::InvalidMessageFormat)?;
+                        let (absx, absy) = abs
+                            .split_once(',')
+                            .ok_or(BrowserEventError::InvalidMessageFormat)?;
+                        Ok(BrowserEvent::MouseMove((
+                            (
+                                relx.parse().map_err(|_| BrowserEventError::ParseError)?,
+                                rely.parse().map_err(|_| BrowserEventError::ParseError)?,
+                            ),
+                            (
+                                absx.parse().map_err(|_| BrowserEventError::ParseError)?,
+                                absy.parse().map_err(|_| BrowserEventError::ParseError)?,
+                            ),
+                        )))
+                    }
+                    "mousewheel" => {
+                        // format is x,y
+                        let (x, y) = data
+                            .split_once(',')
+                            .ok_or(BrowserEventError::InvalidMessageFormat)?;
+                        Ok(BrowserEvent::MouseWheel((
+                            x.parse().map_err(|_| BrowserEventError::ParseError)?,
+                            y.parse().map_err(|_| BrowserEventError::ParseError)?,
+                        )))
+                    }
+                    _ => {
+                        debug!("Other text received");
+                        Err(BrowserEventError::UnknownMessageType)
+                    }
+                }
+            }
+            _ => {
+                debug!("Other Message received");
+                Err(BrowserEventError::UnknownMessageType)
+            }
+        }
+    }
+}
+
 #[allow(clippy::similar_names)]
 fn handle_connection(stream: TcpStream, tx: &Sender<BrowserEvent>) {
     let mut websocket = accept(stream).unwrap();
 
-    println!("Start waiting for messages");
+    debug!("Waiting for messages");
     loop {
         let message = websocket.read().unwrap();
-        println!("Start processing message");
+        debug!("Processing message");
 
         match message {
             Message::Close(_) => {
-                println!("Message::Close received");
+                debug!("Message::Close received");
                 tx.send(BrowserEvent::Close).unwrap();
-                println!("Client disconnected");
+                debug!("Client disconnected");
                 return;
             }
             Message::Text(msg) => {
-                println!("Message::Text received");
-                println!("msg: {msg:?}");
+                debug!("Message::Text received");
+                debug!("msg: {msg:?}");
                 let (key, data) = msg.split_once(':').unwrap();
                 let be = match key {
                     "open" => BrowserEvent::Open,
@@ -61,14 +137,14 @@ fn handle_connection(stream: TcpStream, tx: &Sender<BrowserEvent>) {
                         BrowserEvent::MouseWheel((x.parse().unwrap(), y.parse().unwrap()))
                     }
                     _ => {
-                        println!("Other text received");
+                        debug!("Other text received");
                         continue;
                     }
                 };
                 tx.send(be).unwrap();
             }
             _ => {
-                println!("Other Message received");
+                debug!("Other Message received");
             }
         }
     }
@@ -76,15 +152,15 @@ fn handle_connection(stream: TcpStream, tx: &Sender<BrowserEvent>) {
 
 pub fn launch_ws_server(tx: Sender<BrowserEvent>) {
     let listener = TcpListener::bind("127.0.0.1:26541").unwrap();
-    println!("TcpListener was created");
+    debug!("TcpListener was created");
 
     match listener.accept() {
         Ok((stream, addr)) => {
-            println!("New connection was made from {addr:?}");
+            debug!("New connection was made from {addr:?}");
             handle_connection(stream, &tx);
         }
         Err(e) => {
-            println!("Connection failed: {e:?}");
+            debug!("Connection failed: {e:?}");
         }
     }
 }
@@ -95,7 +171,7 @@ pub fn launch_ws_server(tx: Sender<BrowserEvent>) {
         std::env::current_dir().unwrap().to_str().unwrap()
     );
     if !webbrowser::Browser::Firefox.exists() {
-        println!("Firefox is not installed");
+        debug!("Firefox is not installed");
     }
     if webbrowser::open_browser_with_options(
         webbrowser::Browser::Default,
@@ -106,9 +182,9 @@ pub fn launch_ws_server(tx: Sender<BrowserEvent>) {
     {
         panic!("Unable to open the browser");
     }
-    println!("Try opening test page");
+    debug!("Try opening test page");
     if rs.recv_timeout(std::time::Duration::from_millis(5000)) == Ok(BrowserEvent::Open) {
-        println!("Test page was opened");
+        debug!("Test page was opened");
     } else {
         panic!("Expected Open event");
     }
@@ -120,6 +196,6 @@ pub fn launch_ws_server(tx: Sender<BrowserEvent>) {
             break;
         }
     }*/
-    println!("Done with launch function");
+    debug!("Done with launch function");
 }
 */

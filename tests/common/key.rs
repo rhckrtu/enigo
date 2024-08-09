@@ -1,5 +1,7 @@
 use std::sync::mpsc::Receiver;
 
+use log::debug;
+
 use enigo::{
     Direction::{Press, Release},
     Enigo, Key, Keyboard, Settings,

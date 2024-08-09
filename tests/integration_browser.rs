@@ -1,3 +1,7 @@
+use std::sync::mpsc::channel;
+
+use log::debug;
+
 use enigo::{
     Button,
     Direction::{Click, Press, Release},
@@ -5,26 +9,26 @@ use enigo::{
     {Axis::Horizontal, Axis::Vertical},
     {Coordinate::Abs, Coordinate::Rel},
 };
-use std::sync::mpsc::channel;
 
 mod common;
 use common::BrowserEvent;
 
 #[test]
 fn integration_browser_events() {
+    env_logger::init();
     let (tx, rs) = channel::<BrowserEvent>();
-    println!("Created channel");
+    debug!("Created channel");
     std::thread::spawn(move || common::launch_ws_server(tx));
-    println!("WebSocket server thread was spawned");
+    debug!("WebSocket server thread was spawned");
     std::thread::sleep(std::time::Duration::from_millis(10000)); // Wait a few seconds to make sure the browser was started
                                                                  //common::launch_browser(&rs);
-                                                                 //println!("Browser was launched");
+                                                                 //debug!("Browser was launched");
 
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     /*
     if cfg!(target_os = "macos") {
-            println!("You are on macOS");
+            debug!("You are on macOS");
             (1176, 885)
         } else {
             (1024, 768)
@@ -59,10 +63,10 @@ fn integration_browser_events() {
     }
 
     common::mouse::run(&mut enigo, &rs);
-    println!("Mouse test successfull");
+    debug!("Mouse test successfull");
     common::key::run(&mut enigo, &rs);
-    println!("Keyboard test successfull");
-    println!("All tests successfull");
+    debug!("Keyboard test successfull");
+    debug!("All tests successfull");
 }
 
 /*
@@ -70,7 +74,7 @@ fn integration_browser_events() {
 #[ignore]
 fn run_ws_server() {
     let (tx, _rs) = channel::<BrowserEvent>();
-    println!("Created channel");
+    debug!("Created channel");
     std::thread::spawn(move || common::launch_ws_server(tx));
     std::thread::sleep(std::time::Duration::from_millis(100000)); // Sleep in order to continue running the WebSocket server in another thread
 }

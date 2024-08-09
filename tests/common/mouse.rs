@@ -1,5 +1,7 @@
 use std::sync::mpsc::Receiver;
 
+use log::debug;
+
 use enigo::{Axis, Coordinate, Enigo, Mouse, Settings};
 
 use super::BrowserEvent;
@@ -7,19 +9,19 @@ use super::BrowserEvent;
 const ERROR: i32 = 2;
 
 pub fn run(enigo: &mut Enigo, recv: &Receiver<BrowserEvent>) {
-    println!("Move mouse");
+    debug!("Move mouse");
     set(recv, (100, 100));
-    println!("Move mouse");
+    debug!("Move mouse");
     set(recv, (200, 200));
-    println!("Rel move mouse");
+    debug!("Rel move mouse");
     rel(recv, (20, 20));
-    println!("Rel move mouse");
+    debug!("Rel move mouse");
     rel(recv, (-20, 20));
-    println!("Rel move mouse");
+    debug!("Rel move mouse");
     rel(recv, (20, -20));
-    println!("Rel move mouse");
+    debug!("Rel move mouse");
     rel(recv, (-20, -20));
-    println!("Scroll");
+    debug!("Scroll");
     scroll(recv);
 }
 
@@ -28,15 +30,15 @@ fn set(recv: &Receiver<BrowserEvent>, position: (i32, i32)) {
     enigo
         .move_mouse(position.0, position.1, Coordinate::Abs)
         .unwrap();
-    println!("Executed Enigo");
+    debug!("Executed Enigo");
     let ev = recv
         .recv_timeout(std::time::Duration::from_millis(5000))
         .unwrap();
-    println!("Done waiting");
+    debug!("Done waiting");
     if let BrowserEvent::MouseMove(pos) = ev {
         assert!((position.0 - pos.1 .0).abs() <= ERROR);
         assert!((position.1 - pos.1 .1).abs() <= ERROR);
-        println!("Move success");
+        debug!("Move success");
     } else {
         panic!("Event wasn't MouseMove after mouse::set. {ev:?}");
     }
@@ -47,15 +49,15 @@ fn rel(recv: &Receiver<BrowserEvent>, offset: (i32, i32)) {
     enigo
         .move_mouse(offset.0, offset.1, Coordinate::Rel)
         .unwrap();
-    println!("Executed Enigo");
+    debug!("Executed Enigo");
     let ev = recv
         .recv_timeout(std::time::Duration::from_millis(5000))
         .unwrap();
-    println!("Done waiting");
+    debug!("Done waiting");
     if let BrowserEvent::MouseMove(pos) = ev {
         assert!((offset.0 - pos.0 .0).abs() <= ERROR);
         assert!((offset.1 - pos.0 .1).abs() <= ERROR);
-        println!("Rel move success");
+        debug!("Rel move success");
     } else {
         panic!("Event wasn't MouseMove after mouse::rel. {ev:?}");
     }
@@ -64,13 +66,13 @@ fn rel(recv: &Receiver<BrowserEvent>, offset: (i32, i32)) {
 fn scroll(recv: &Receiver<BrowserEvent>) {
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
     enigo.scroll(1, Axis::Horizontal).unwrap();
-    println!("Executed Enigo");
+    debug!("Executed Enigo");
     let ev = recv
         .recv_timeout(std::time::Duration::from_millis(5000))
         .unwrap();
-    println!("Done waiting");
+    debug!("Done waiting");
     if let BrowserEvent::MouseWheel(length) = ev {
-        println!("Scroll success");
+        debug!("Scroll success");
         assert!(length.0 > 0);
         assert!(length.1 == 0);
     } else {
@@ -78,13 +80,13 @@ fn scroll(recv: &Receiver<BrowserEvent>) {
     }
 
     enigo.scroll(1, Axis::Vertical).unwrap();
-    println!("Executed Enigo");
+    debug!("Executed Enigo");
     let ev = recv
         .recv_timeout(std::time::Duration::from_millis(5000))
         .unwrap();
-    println!("Done waiting");
+    debug!("Done waiting");
     if let BrowserEvent::MouseWheel(length) = ev {
-        println!("Scroll success");
+        debug!("Scroll success");
         assert!(length.0 == 0);
         assert!(length.1 > 0);
     } else {
