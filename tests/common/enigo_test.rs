@@ -32,7 +32,7 @@ impl EnigoTest {
                     println!("Received BrowserEvent: {event:?}");
                 }
                 Err(err) => {
-                    println!("Received error: {err:?}");
+                    println!("Received {err:?}");
                     break;
                 }
             }
@@ -53,6 +53,8 @@ impl EnigoTest {
             self.key(Key::Control, Release).unwrap();
         } else {
             self.key(Key::F11, Click).unwrap();
+            // Wait for full screen animation
+            std::thread::sleep(std::time::Duration::from_millis(3000));
             self.move_mouse(200, 200, Abs).unwrap();
             self.button(Button::Left, Click).unwrap();
         };
@@ -109,7 +111,7 @@ impl Mouse for EnigoTest {
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             if let BrowserEvent::MouseDown(name) = ev {
-                assert_eq!(format!("{button:?}").to_lowercase(), name.to_lowercase());
+                assert_eq!(button as u32, name);
             } else {
                 panic!("BrowserEvent was not a MouseDown: {ev:?}");
             }
@@ -120,7 +122,7 @@ impl Mouse for EnigoTest {
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             if let BrowserEvent::MouseUp(name) = ev {
-                assert_eq!(format!("{button:?}").to_lowercase(), name.to_lowercase());
+                assert_eq!(button as u32, name);
             } else {
                 panic!("BrowserEvent was not a MouseUp: {ev:?}");
             }
@@ -138,10 +140,10 @@ impl Mouse for EnigoTest {
             .unwrap();
         println!("Done waiting");
 
-        let mouse_position = if let BrowserEvent::MouseMove(pos) = ev {
+        let mouse_position = if let BrowserEvent::MouseMove(pos_rel, pos_abs) = ev {
             match coordinate {
-                Coordinate::Rel => pos.0,
-                Coordinate::Abs => pos.1,
+                Coordinate::Rel => pos_rel,
+                Coordinate::Abs => pos_abs,
             }
         } else {
             panic!("BrowserEvent was not a MouseMove: {ev:?}");
@@ -156,23 +158,30 @@ impl Mouse for EnigoTest {
     fn scroll(&mut self, length: i32, axis: Axis) -> enigo::InputResult<()> {
         let res = self.enigo.scroll(length, axis);
         println!("Executed Enigo");
-        let ev = self
-            .rs
-            .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-            .unwrap();
-        println!("Done waiting");
 
-        let mouse_scroll = if let BrowserEvent::MouseScroll(length) = ev {
-            match axis {
-                Axis::Horizontal => length.0,
-                Axis::Vertical => length.1,
-            }
-        } else {
-            panic!("BrowserEvent was not a MouseScroll: {ev:?}");
-        };
+        // On some platforms it is not possible to scroll multiple lines so we repeatedly scroll. In order for this test to work on all platforms, both cases are not differentiated
+        let mut mouse_scroll = length;
+        while mouse_scroll >= -1 {
+            let ev = self
+                .rs
+                .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
+                .unwrap();
+            println!("Done waiting");
 
-        assert!(length == mouse_scroll);
+            mouse_scroll -=
+                if let BrowserEvent::MouseScroll(horizontal_scroll, vertical_scroll) = ev {
+                    match axis {
+                        Axis::Horizontal => horizontal_scroll,
+                        Axis::Vertical => vertical_scroll,
+                    }
+                } else {
+                    panic!("BrowserEvent was not a MouseScroll: {ev:?}");
+                };
+        }
+
         println!("enigo.scroll() was a success");
+
+        panic!("Intentionally panics to show output");
         res
     }
 
@@ -181,8 +190,8 @@ impl Mouse for EnigoTest {
         match res {
             Ok((x, y)) => {
                 let (winit_x, winit_y) = winit_main_display();
-                assert!(x == winit_x);
-                assert!(y == winit_y);
+                assert_eq!(x, winit_x);
+                assert_eq!(y, winit_y);
             }
             Err(_) => todo!(),
         }
@@ -194,8 +203,8 @@ impl Mouse for EnigoTest {
         match res {
             Ok((x, y)) => {
                 let (winit_x, winit_y) = winit_location();
-                assert!(x == winit_x);
-                assert!(y == winit_y);
+                assert_eq!(x, winit_x);
+                assert_eq!(y, winit_y);
             }
             Err(_) => todo!(),
         }

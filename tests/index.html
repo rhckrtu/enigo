@@ -45,8 +45,8 @@
             handleEvent('Close', event);
             document.getElementById('output1').innerHTML = 'Test concluded. Close this page.';
         });
-        document.addEventListener('keydown', (event) => handleEvent('KeyDown', `(${event.key})`));
-        document.addEventListener('keyup', (event) => handleEvent('KeyUp', `(${event.key})`));
+        document.addEventListener('keydown', (event) => handleEvent('KeyDown', `(\"${event.key}\")`));
+        document.addEventListener('keyup', (event) => handleEvent('KeyUp', `(\"${event.key}\")`));
         document.addEventListener('mousedown', (event) => handleEvent('MouseDown', `(${event.button})`));
         document.addEventListener('mouseup', (event) => handleEvent('MouseUp', `(${event.button})`));
         document.addEventListener('mousemove', (event) => handleEvent('MouseMove', `((${event.movementX},${event.movementY}),(${event.screenX},${event.screenY}))`));

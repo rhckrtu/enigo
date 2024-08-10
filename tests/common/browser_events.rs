@@ -5,10 +5,10 @@ use tungstenite::Message;
 pub enum BrowserEvent {
     KeyDown(String),
     KeyUp(String),
-    MouseDown(String),
-    MouseUp(String),
-    MouseMove(((i32, i32), (i32, i32))), // (relative, absolute)
-    MouseScroll((i32, i32)),
+    MouseDown(u32),
+    MouseUp(u32),
+    MouseMove((i32, i32), (i32, i32)), // (relative, absolute)
+    MouseScroll(i32, i32),
     Open,
     Close,
 }
@@ -16,7 +16,6 @@ pub enum BrowserEvent {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum BrowserEventError {
     UnknownMessageType,
-    InvalidMessageFormat,
     ParseError,
 }
 
@@ -32,12 +31,57 @@ impl TryFrom<Message> for BrowserEvent {
             Message::Text(msg) => {
                 println!("Message::Text received");
                 println!("msg: {:?}", msg);
-                ron::from_str(&msg).unwrap()
+
+                // Attempt to deserialize the text message into a BrowserEvent
+                match ron::from_str::<BrowserEvent>(&msg) {
+                    Ok(event) => Ok(event),
+                    Err(_) => {
+                        println!("Parse error");
+                        Err(BrowserEventError::ParseError)
+                    }
+                }
             }
             _ => {
                 println!("Other Message received");
                 Err(BrowserEventError::UnknownMessageType)
             }
         }
+    }
+}
+
+#[test]
+fn deserialize_browser_events() {
+    let messages = vec![
+        (
+            Message::Text("KeyDown(\"F11\")".to_string()),
+            BrowserEvent::KeyDown("F11".to_string()),
+        ),
+        (
+            Message::Text("KeyUp(\"F11\")".to_string()),
+            BrowserEvent::KeyUp("F11".to_string()),
+        ),
+        (
+            Message::Text("MouseDown(0)".to_string()),
+            BrowserEvent::MouseDown(0),
+        ),
+        (
+            Message::Text("MouseUp(0)".to_string()),
+            BrowserEvent::MouseUp(0),
+        ),
+        (
+            Message::Text("MouseMove((-1806, -487), (200, 200))".to_string()),
+            BrowserEvent::MouseMove((-1806, -487), (200, 200)),
+        ),
+        (
+            Message::Text("MouseScroll(3, -2)".to_string()),
+            BrowserEvent::MouseScroll(3, -2),
+        ),
+    ];
+
+    for (msg, event) in messages {
+        let serialized = ron::to_string(&event).unwrap();
+        println!("serialized = {serialized}");
+
+        assert!(BrowserEvent::try_from(msg).unwrap() == event)
     }
 }
