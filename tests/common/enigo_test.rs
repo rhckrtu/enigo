@@ -11,6 +11,7 @@ use super::browser_events::BrowserEvent;
 
 const DELTA: i32 = 0; // TODO: Should there be a delta? Investigate if mouse acceleration can cause a delta
 const TIMEOUT: u64 = 5000;
+const scroll_step: (i32, i32) = (20, 114); // (horizontal, vertical)
 
 pub struct EnigoTest {
     enigo: Enigo,
@@ -156,32 +157,32 @@ impl Mouse for EnigoTest {
     }
 
     fn scroll(&mut self, length: i32, axis: Axis) -> enigo::InputResult<()> {
+        let mut length = length;
         let res = self.enigo.scroll(length, axis);
         println!("Executed Enigo");
 
         // On some platforms it is not possible to scroll multiple lines so we repeatedly scroll. In order for this test to work on all platforms, both cases are not differentiated
-        let mut mouse_scroll = length;
-        while mouse_scroll >= -1 {
+        let (mut mouse_scroll, mut step) = (0, 0);
+        while length > 0 {
             let ev = self
                 .rs
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             println!("Done waiting");
 
-            mouse_scroll -=
+            (mouse_scroll, step) =
                 if let BrowserEvent::MouseScroll(horizontal_scroll, vertical_scroll) = ev {
                     match axis {
-                        Axis::Horizontal => horizontal_scroll,
-                        Axis::Vertical => vertical_scroll,
+                        Axis::Horizontal => (horizontal_scroll, scroll_step.0),
+                        Axis::Vertical => (vertical_scroll, scroll_step.1),
                     }
                 } else {
                     panic!("BrowserEvent was not a MouseScroll: {ev:?}");
                 };
+            length -= mouse_scroll / step;
         }
 
         println!("enigo.scroll() was a success");
-
-        panic!("Intentionally panics to show output");
         res
     }
 
