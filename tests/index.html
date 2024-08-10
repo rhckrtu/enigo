@@ -74,17 +74,24 @@
         ws.addEventListener('message', (event) => {
             console.log('Received message:', event.data);
 
+            // Server asks to clear the text and focus on it
+            if (event.data === 'ClearText') {
+                document.getElementById('text').value = '';
+                document.getElementById('text').focus();
+            }
+
             // Server asks for the form's content
-            if (event.data === 'GetFormInput') {
+            if (event.data === 'GetText') {
                 const text = document.getElementById('text').value;
 
                 // Send the form's content via WebSocket
-                ws.send(`Text(${text})`);
+                ws.send(`Text(\"${text}\")`);
 
                 // Clear the input field after sending
                 document.getElementById('text').value = '';
             }
         });
+
 
 
     </script>

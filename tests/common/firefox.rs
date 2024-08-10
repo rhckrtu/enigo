@@ -14,6 +14,5 @@ pub static FIREFOX_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
             .arg(url)
             .spawn()
             .expect("Failed to start Firefox");
-        std::thread::sleep(std::time::Duration::from_secs(10)); // Give Firefox some time to launch
         Some(child)
     });

@@ -1,4 +1,7 @@
-use std::sync::mpsc::Receiver;
+use std::net::{TcpListener, TcpStream};
+use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
+
+use tungstenite::accept;
 
 use enigo::{
     Axis, Button,
@@ -10,41 +13,29 @@ use enigo::{
 use super::browser_events::BrowserEvent;
 
 const DELTA: i32 = 0; // TODO: Should there be a delta? Investigate if mouse acceleration can cause a delta
-const TIMEOUT: u64 = 5000;
-const scroll_step: (i32, i32) = (20, 114); // (horizontal, vertical)
+const TIMEOUT: u64 = 10; // Number of minutes the test is allowed to run before timing out
+                         // This is needed, because some of the websocket functions are blocking and would run indefinitely without a timeout if they don't receive a message
+const SCROLL_STEP: (i32, i32) = (20, 114); // (horizontal, vertical)
 
 pub struct EnigoTest {
     enigo: Enigo,
-    rs: Receiver<BrowserEvent>,
+    websocket: tungstenite::WebSocket<TcpStream>,
 }
 
 impl EnigoTest {
     pub fn new(settings: Settings) -> Self {
+        env_logger::init();
+        EnigoTest::start_timeout_thread();
         let enigo = Enigo::new(&settings).unwrap();
-        let rs = super::setup_integration_tests();
-        Self { enigo, rs }
-    }
+        let _ = &*super::firefox::FIREFOX_INSTANCE; // Launch Firefox
+        let websocket = Self::websocket();
 
-    // Print all the BrowserEvents until receiving the first timeout
-    pub fn print_events(&self) {
-        loop {
-            match self.rs.recv_timeout(std::time::Duration::from_millis(500)) {
-                Ok(event) => {
-                    println!("Received BrowserEvent: {event:?}");
-                }
-                Err(err) => {
-                    println!("Received {err:?}");
-                    break;
-                }
-            }
-        }
+        std::thread::sleep(std::time::Duration::from_secs(10)); // Give Firefox some time to launch
+        Self { enigo, websocket }
     }
 
     // Maximize Firefox by pressing keys or moving the mouse
     pub fn maximize_firefox(&mut self) {
-        self.print_events();
-
-        // Maximize Firefox
         if cfg!(target_os = "macos") {
             self.key(Key::Control, Press).unwrap();
             self.key(Key::Meta, Press).unwrap();
@@ -63,32 +54,73 @@ impl EnigoTest {
         // Wait for full screen animation
         std::thread::sleep(std::time::Duration::from_millis(3000));
     }
+
+    pub fn websocket() -> tungstenite::WebSocket<TcpStream> {
+        let listener = TcpListener::bind("127.0.0.1:26541").unwrap();
+        println!("TcpListener was created");
+        let (stream, addr) = listener.accept().expect("Unable to accept the connection");
+        println!("New connection was made from {addr:?}");
+        let websocket = accept(stream).expect("Unable to accept connections on the websocket");
+        println!("WebSocket was successfully created");
+        websocket
+    }
+
+    fn send_message(&mut self, msg: &str) {
+        println!("Sending message: {msg}");
+        let message = self
+            .websocket
+            .send(tungstenite::Message::Text(msg.to_string()))
+            .expect("Unable to send the message");
+        println!("Sent message");
+    }
+
+    fn read_message(&mut self) -> BrowserEvent {
+        println!("Waiting for message on Websocket");
+        let message = self.websocket.read().unwrap();
+        println!("Processing message");
+
+        let browser_event = match BrowserEvent::try_from(message) {
+            Ok(browser_event) => browser_event,
+            Err(_) => {
+                panic!("Other text received");
+            }
+        };
+        if browser_event == BrowserEvent::Close {
+            panic!("Received a Close event");
+        }
+        browser_event
+    }
+
+    fn start_timeout_thread() {
+        // Spawn a thread to handle the timeout
+        std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_secs(TIMEOUT * 60));
+            panic!("Test suite exceeded the maximum allowed time of {TIMEOUT} minutes.");
+        });
+    }
 }
 
 impl Keyboard for EnigoTest {
+    // This does not work for all text or the library does not work properly
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
-        let res = self.enigo.text(text);
+        self.send_message("ClearText");
+        let res = self.enigo.fast_text(text);
+        self.send_message("GetText");
 
-        let ev = self
-            .rs
-            .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-            .unwrap();
-        if let BrowserEvent::KeyDown(name) = ev {
-            println!("received pressed key: {name}");
-        } else {
-            panic!("BrowserEvent was not a KeyDown: {ev:?}");
+        loop {
+            if let BrowserEvent::Text(received_text) = self.read_message() {
+                println!("received text: {received_text}");
+                assert_eq!(text, received_text);
+                break;
+            }
         }
-
-        todo!()
+        res
     }
 
     fn key(&mut self, key: Key, direction: Direction) -> enigo::InputResult<()> {
         let res = self.enigo.key(key, direction);
         if direction == Press || direction == Click {
-            let ev = self
-                .rs
-                .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-                .unwrap();
+            let ev = self.read_message();
             if let BrowserEvent::KeyDown(name) = ev {
                 println!("received pressed key: {name}");
                 assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
@@ -97,10 +129,7 @@ impl Keyboard for EnigoTest {
             }
         }
         if direction == Release || direction == Click {
-            let ev = self
-                .rs
-                .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-                .unwrap();
+            let ev = self.read_message();
             if let BrowserEvent::KeyUp(name) = ev {
                 println!("received released key: {name}");
                 assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
@@ -121,10 +150,7 @@ impl Mouse for EnigoTest {
     fn button(&mut self, button: enigo::Button, direction: Direction) -> enigo::InputResult<()> {
         let res = self.enigo.button(button, direction);
         if direction == Press || direction == Click {
-            let ev = self
-                .rs
-                .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-                .unwrap();
+            let ev = self.read_message();
             if let BrowserEvent::MouseDown(name) = ev {
                 println!("received pressed button: {name}");
                 assert_eq!(button as u32, name);
@@ -133,10 +159,7 @@ impl Mouse for EnigoTest {
             }
         }
         if direction == Release || direction == Click {
-            let ev = self
-                .rs
-                .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-                .unwrap();
+            let ev = self.read_message();
             if let BrowserEvent::MouseUp(name) = ev {
                 println!("received released button: {name}");
                 assert_eq!(button as u32, name);
@@ -151,10 +174,8 @@ impl Mouse for EnigoTest {
     fn move_mouse(&mut self, x: i32, y: i32, coordinate: Coordinate) -> enigo::InputResult<()> {
         let res = self.enigo.move_mouse(x, y, coordinate);
         println!("Executed enigo.move_mouse");
-        let ev = self
-            .rs
-            .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-            .unwrap();
+
+        let ev = self.read_message();
         println!("Done waiting");
 
         let mouse_position = if let BrowserEvent::MouseMove(pos_rel, pos_abs) = ev {
@@ -180,17 +201,14 @@ impl Mouse for EnigoTest {
         // On some platforms it is not possible to scroll multiple lines so we repeatedly scroll. In order for this test to work on all platforms, both cases are not differentiated
         let (mut mouse_scroll, mut step) = (0, 0);
         while length > 0 {
-            let ev = self
-                .rs
-                .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
-                .unwrap();
+            let ev = self.read_message();
             println!("Done waiting");
 
             (mouse_scroll, step) =
                 if let BrowserEvent::MouseScroll(horizontal_scroll, vertical_scroll) = ev {
                     match axis {
-                        Axis::Horizontal => (horizontal_scroll, scroll_step.0),
-                        Axis::Vertical => (vertical_scroll, scroll_step.1),
+                        Axis::Horizontal => (horizontal_scroll, SCROLL_STEP.0),
+                        Axis::Vertical => (vertical_scroll, SCROLL_STEP.1),
                     }
                 } else {
                     panic!("BrowserEvent was not a MouseScroll: {ev:?}");
