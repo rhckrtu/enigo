@@ -14,13 +14,13 @@ fn integration_browser_events() {
 
     enigo.maximize_firefox();
 
-    //enigo.key(Key::F1, Click).unwrap();
-    //enigo.key(Key::Control, Click).unwrap();
-    // enigo.key(Key::Backspace, Click).unwrap();
-    // enigo.key(Key::PageUp, Click).unwrap(); // Failing on Windows
+    enigo.key(Key::F1, Click).unwrap();
+    enigo.key(Key::Control, Click).unwrap();
+    enigo.key(Key::Backspace, Click).unwrap();
+    enigo.key(Key::PageUp, Click).unwrap(); // Failing on Windows
 
-    // enigo.key(Key::Backspace, Press).unwrap();
-    // enigo.key(Key::Backspace, Release).unwrap();
+    enigo.key(Key::Backspace, Press).unwrap();
+    enigo.key(Key::Backspace, Release).unwrap();
 
     println!("Test mouse");
     enigo.move_mouse(100, 100, Abs).unwrap();

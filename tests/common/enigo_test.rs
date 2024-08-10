@@ -78,6 +78,7 @@ impl Keyboard for EnigoTest {
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             if let BrowserEvent::KeyDown(name) = ev {
+                println!("received pressed key: {name}");
                 assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
             } else {
                 panic!("BrowserEvent was not a KeyDown: {ev:?}");
@@ -89,6 +90,7 @@ impl Keyboard for EnigoTest {
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             if let BrowserEvent::KeyUp(name) = ev {
+                println!("received released key: {name}");
                 assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
             } else {
                 panic!("BrowserEvent was not a KeyUp: {ev:?}");
@@ -112,6 +114,7 @@ impl Mouse for EnigoTest {
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             if let BrowserEvent::MouseDown(name) = ev {
+                println!("received pressed button: {name}");
                 assert_eq!(button as u32, name);
             } else {
                 panic!("BrowserEvent was not a MouseDown: {ev:?}");
@@ -123,6 +126,7 @@ impl Mouse for EnigoTest {
                 .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
                 .unwrap();
             if let BrowserEvent::MouseUp(name) = ev {
+                println!("received released button: {name}");
                 assert_eq!(button as u32, name);
             } else {
                 panic!("BrowserEvent was not a MouseUp: {ev:?}");
