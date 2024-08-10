@@ -14,6 +14,7 @@ fn integration_browser_events() {
 
     enigo.maximize_firefox();
 
+    enigo.text("TestText").unwrap();
     enigo.key(Key::F1, Click).unwrap();
     enigo.key(Key::Control, Click).unwrap();
     enigo.key(Key::Backspace, Click).unwrap();

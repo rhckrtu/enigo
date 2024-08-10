@@ -67,6 +67,18 @@ impl EnigoTest {
 
 impl Keyboard for EnigoTest {
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
+        let res = self.enigo.text(text);
+
+        let ev = self
+            .rs
+            .recv_timeout(std::time::Duration::from_millis(TIMEOUT))
+            .unwrap();
+        if let BrowserEvent::KeyDown(name) = ev {
+            println!("received pressed key: {name}");
+        } else {
+            panic!("BrowserEvent was not a KeyDown: {ev:?}");
+        }
+
         todo!()
     }
 
