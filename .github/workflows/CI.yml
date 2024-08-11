@@ -100,10 +100,10 @@ jobs:
       - name: Take screenshot
         uses: ./.github/actions/screenshot
         with:
-          step: before
-          rust: ${{ matrix.rust }}
           platform: ${{ matrix.platform }}
+          rust: ${{ matrix.rust }}
           feature: ${{ matrix.features }}
+          step: before
 
       - name: Run integration tests
         run: cargo test integration --no-default-features --features ${{ matrix.features }} -- --test-threads=1 --include-ignored --nocapture
@@ -112,10 +112,10 @@ jobs:
         if: always() 
         uses: ./.github/actions/screenshot
         with:
-          step: during
-          rust: ${{ matrix.rust }}
           platform: ${{ matrix.platform }}
+          rust: ${{ matrix.rust }}
           feature: ${{ matrix.features }}
+          step: during
 
     #  - name: Do something after the integration tests
     #    if: always()
