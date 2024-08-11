@@ -117,7 +117,6 @@ impl Keyboard for EnigoTest {
 
     fn key(&mut self, key: Key, direction: Direction) -> enigo::InputResult<()> {
         let res = self.enigo.key(key, direction);
-        std::thread::sleep(std::time::Duration::from_millis(INPUT_DELAY)); // Wait for input to have an effect
         if direction == Press || direction == Click {
             let ev = self.read_message();
             if let BrowserEvent::KeyDown(name) = ev {
@@ -134,6 +133,7 @@ impl Keyboard for EnigoTest {
             }
         }
         if direction == Release || direction == Click {
+            std::thread::sleep(std::time::Duration::from_millis(INPUT_DELAY)); // Wait for input to have an effect
             let ev = self.read_message();
             if let BrowserEvent::KeyUp(name) = ev {
                 println!("received released key: {name}");
@@ -160,7 +160,6 @@ impl Keyboard for EnigoTest {
 impl Mouse for EnigoTest {
     fn button(&mut self, button: enigo::Button, direction: Direction) -> enigo::InputResult<()> {
         let res = self.enigo.button(button, direction);
-        std::thread::sleep(std::time::Duration::from_millis(INPUT_DELAY)); // Wait for input to have an effect
         if direction == Press || direction == Click {
             let ev = self.read_message();
             if let BrowserEvent::MouseDown(name) = ev {
@@ -171,6 +170,7 @@ impl Mouse for EnigoTest {
             }
         }
         if direction == Release || direction == Click {
+            std::thread::sleep(std::time::Duration::from_millis(INPUT_DELAY)); // Wait for input to have an effect
             let ev = self.read_message();
             if let BrowserEvent::MouseUp(name) = ev {
                 println!("received released button: {name}");
