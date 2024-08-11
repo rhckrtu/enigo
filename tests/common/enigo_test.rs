@@ -36,11 +36,11 @@ impl EnigoTest {
     // Maximize Firefox by pressing keys or moving the mouse
     pub fn maximize_browser(&mut self) {
         if cfg!(target_os = "macos") {
-            self.key(Key::Control, Press).unwrap();
-            self.key(Key::Meta, Press).unwrap();
+            //  self.key(Key::Control, Press).unwrap();
+            //  self.key(Key::Meta, Press).unwrap();
             self.key(Key::Unicode('f'), Click).unwrap();
-            self.key(Key::Meta, Release).unwrap();
-            self.key(Key::Control, Release).unwrap();
+            //  self.key(Key::Meta, Release).unwrap();
+            //  self.key(Key::Control, Release).unwrap();
         } else {
             self.key(Key::F11, Click).unwrap();
             // self.move_mouse(200, 200, Abs).unwrap();
