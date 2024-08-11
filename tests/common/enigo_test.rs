@@ -91,7 +91,8 @@ impl EnigoTest {
         // Spawn a thread to handle the timeout
         std::thread::spawn(move || {
             std::thread::sleep(std::time::Duration::from_secs(TIMEOUT * 60));
-            panic!("Test suite exceeded the maximum allowed time of {TIMEOUT} minutes.");
+            println!("Test suite exceeded the maximum allowed time of {TIMEOUT} minutes.");
+            std::process::exit(1); // Exit with error code
         });
     }
 }
