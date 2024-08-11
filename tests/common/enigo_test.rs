@@ -120,7 +120,7 @@ impl Keyboard for EnigoTest {
             let ev = self.read_message();
             if let BrowserEvent::KeyDown(name) = ev {
                 println!("received pressed key: {name}");
-                // assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
+                assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
             } else {
                 panic!("BrowserEvent was not a KeyDown: {ev:?}");
             }
@@ -129,7 +129,7 @@ impl Keyboard for EnigoTest {
             let ev = self.read_message();
             if let BrowserEvent::KeyUp(name) = ev {
                 println!("received released key: {name}");
-                // assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
+                assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
             } else {
                 panic!("BrowserEvent was not a KeyUp: {ev:?}");
             }
@@ -150,7 +150,7 @@ impl Mouse for EnigoTest {
             let ev = self.read_message();
             if let BrowserEvent::MouseDown(name) = ev {
                 println!("received pressed button: {name}");
-                // assert_eq!(button as u32, name);
+                assert_eq!(button as u32, name);
             } else {
                 panic!("BrowserEvent was not a MouseDown: {ev:?}");
             }
@@ -159,7 +159,7 @@ impl Mouse for EnigoTest {
             let ev = self.read_message();
             if let BrowserEvent::MouseUp(name) = ev {
                 println!("received released button: {name}");
-                // assert_eq!(button as u32, name);
+                assert_eq!(button as u32, name);
             } else {
                 panic!("BrowserEvent was not a MouseUp: {ev:?}");
             }
@@ -184,8 +184,8 @@ impl Mouse for EnigoTest {
             panic!("BrowserEvent was not a MouseMove: {ev:?}");
         };
 
-        // assert!((x - mouse_position.0).abs() <= DELTA);
-        // assert!((y - mouse_position.1).abs() <= DELTA);
+        assert!((x - mouse_position.0).abs() <= DELTA);
+        assert!((y - mouse_position.1).abs() <= DELTA);
         println!("enigo.move_mouse() was a success");
         res
     }
@@ -224,8 +224,8 @@ impl Mouse for EnigoTest {
                 let (rdev_x, rdev_y) = rdev_main_display();
                 println!("enigo display: {x},{y}");
                 println!("rdev_display: {rdev_x},{rdev_y}");
-                // assert_eq!(x, rdev_x);
-                // assert_eq!(y, rdev_y);
+                assert_eq!(x, rdev_x);
+                assert_eq!(y, rdev_y);
             }
             Err(_) => todo!(),
         }
@@ -240,8 +240,8 @@ impl Mouse for EnigoTest {
                 let (mouse_x, mouse_y) = mouse_position();
                 println!("enigo_position: {x},{y}");
                 println!("mouse_position: {mouse_x},{mouse_y}");
-                // assert_eq!(x, mouse_x);
-                // assert_eq!(y, mouse_y);
+                assert_eq!(x, mouse_x);
+                assert_eq!(y, mouse_y);
             }
             Err(_) => todo!(),
         }
