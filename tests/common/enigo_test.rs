@@ -11,7 +11,6 @@ use enigo::{
 
 use super::browser_events::BrowserEvent;
 
-const DELTA: i32 = 0; // TODO: Should there be a delta? Investigate if mouse acceleration can cause a delta
 const TIMEOUT: u64 = 3; // Number of minutes the test is allowed to run before timing out
                         // This is needed, because some of the websocket functions are blocking and would run indefinitely without a timeout if they don't receive a message
 const SCROLL_STEP: (i32, i32) = (20, 114); // (horizontal, vertical)
@@ -196,8 +195,8 @@ impl Mouse for EnigoTest {
             panic!("BrowserEvent was not a MouseMove: {ev:?}");
         };
 
-        assert!((x - mouse_position.0).abs() <= DELTA);
-        assert!((y - mouse_position.1).abs() <= DELTA);
+        assert_eq!(x, mouse_position.0);
+        assert_eq!(y, mouse_position.1);
         println!("enigo.move_mouse() was a success");
         res
     }
