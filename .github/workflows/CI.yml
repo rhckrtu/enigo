@@ -22,32 +22,32 @@ jobs:
          # - "1.75.0"
         platform:
           - ubuntu-latest
-         # - windows-latest
-         # - macos-latest
+          - windows-latest
+          - macos-latest
         features:
          # - "--all-features"
          # - "--features default"
          # - "--features libei"
-          - "--features wayland"
+         # - "--features wayland"
           - "--features xdo"
           - "--features x11rb"
-        #exclude:
-        #  - platform: windows-latest
-        #    features: "--features libei"
-        #  - platform: windows-latest
-        #    features: "--features wayland"
-        #  - platform: windows-latest
-        #    features: "--features xdo"
-        #  - platform: windows-latest
-        #    features: "--features x11rb"
-        #  - platform: macos-latest
-        #    features: "--features libei"
-        #  - platform: macos-latest
-        #    features: "--features wayland"
-        #  - platform: macos-latest
-        #    features: "--features xdo"
-        #  - platform: macos-latest
-        #    features: "--features x11rb"
+        exclude:
+          - platform: windows-latest
+            features: "--features libei"
+          - platform: windows-latest
+            features: "--features wayland"
+          - platform: windows-latest
+            features: "--features xdo"
+          - platform: windows-latest
+            features: "--features x11rb"
+          - platform: macos-latest
+            features: "--features libei"
+          - platform: macos-latest
+            features: "--features wayland"
+          - platform: macos-latest
+            features: "--features xdo"
+          - platform: macos-latest
+            features: "--features x11rb"
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -127,10 +127,10 @@ jobs:
      #     feature: ${{ matrix.features }}
 
       # Delete duplicate artifacts
-   #   - uses: geekyeggo/delete-artifact@v5
-   #     if: always()
-   #     with:
-   #       name: |
-   #         ${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg
-   #         ${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg
-   #         ${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg
+      - uses: geekyeggo/delete-artifact@v5
+        if: always()
+        with:
+          name: |
+            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg
+            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg
+            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg
