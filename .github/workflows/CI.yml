@@ -28,7 +28,7 @@ jobs:
          # - "--all-features"
          # - "--features default"
          # - "--features libei"
-         # - "--features wayland"
+          - "--features wayland"
           - "--features xdo"
           - "--features x11rb"
         #exclude:
@@ -127,10 +127,10 @@ jobs:
      #     feature: ${{ matrix.features }}
 
       # Delete duplicate artifacts
-      - uses: geekyeggo/delete-artifact@v5
-        if: always()
-        with:
-          name: |
-            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg
-            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg
-            ${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg
+   #   - uses: geekyeggo/delete-artifact@v5
+   #     if: always()
+   #     with:
+   #       name: |
+   #         ${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg
+   #         ${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg
+   #         ${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg
