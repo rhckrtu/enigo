@@ -1,3 +1,3 @@
-pub mod browser_events;
+mod browser_events;
 pub mod enigo_test;
 mod firefox;

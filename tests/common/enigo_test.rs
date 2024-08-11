@@ -1,5 +1,4 @@
 use std::net::{TcpListener, TcpStream};
-use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
 
 use tungstenite::accept;
 
@@ -30,7 +29,7 @@ impl EnigoTest {
         let _ = &*super::firefox::FIREFOX_INSTANCE; // Launch Firefox
         let websocket = Self::websocket();
 
-        std::thread::sleep(std::time::Duration::from_secs(10)); // Give Firefox some time to launch
+        std::thread::sleep(std::time::Duration::from_secs(5)); // Give Firefox some time to launch
         Self { enigo, websocket }
     }
 
@@ -45,17 +44,15 @@ impl EnigoTest {
             self.key(Key::Control, Release).unwrap();
         } else {
             self.key(Key::F11, Click).unwrap();
-            // Wait for full screen animation
-            std::thread::sleep(std::time::Duration::from_millis(3000));
-            self.move_mouse(200, 200, Abs).unwrap();
-            self.button(Button::Left, Click).unwrap();
+            // self.move_mouse(200, 200, Abs).unwrap();
+            // self.button(Button::Left, Click).unwrap();
         };
 
         // Wait for full screen animation
         std::thread::sleep(std::time::Duration::from_millis(3000));
     }
 
-    pub fn websocket() -> tungstenite::WebSocket<TcpStream> {
+    fn websocket() -> tungstenite::WebSocket<TcpStream> {
         let listener = TcpListener::bind("127.0.0.1:26541").unwrap();
         println!("TcpListener was created");
         let (stream, addr) = listener.accept().expect("Unable to accept the connection");
@@ -233,17 +230,31 @@ impl Mouse for EnigoTest {
         res
     }
 
+    // Edge cases don't work (mouse is at the left most border and can't move one to the left)
     fn location(&self) -> enigo::InputResult<(i32, i32)> {
-        let res = self.enigo.location();
-        match res {
-            Ok((x, y)) => {
-                let (winit_x, winit_y) = winit_location();
-                assert_eq!(x, winit_x);
-                assert_eq!(y, winit_y);
-            }
-            Err(_) => todo!(),
-        }
-        res
+        let (x, y) = self
+            .enigo
+            .location()
+            .expect("Error executing enigo.location()");
+        println!("Executed enigo.location()");
+
+        self.enigo.move_mouse(-1, 0, Coordinate::Rel);
+        self.enigo.move_mouse(1, 0, Coordinate::Rel);
+        println!("Moved mouse one pixel to the left and back");
+
+        let _ = self.read_message();
+        let ev = self.read_message();
+        println!("Done waiting");
+
+        if let BrowserEvent::MouseMove(_, (mouse_x, mouse_y)) = ev {
+            assert_eq!(x, mouse_x);
+            assert_eq!(y, mouse_y);
+            println!("enigo.move_mouse() was a success");
+        } else {
+            panic!("BrowserEvent was not a MouseMove: {ev:?}");
+        };
+
+        Ok((x, y))
     }
 }
 
@@ -251,8 +262,10 @@ fn winit_main_display() -> (i32, i32) {
     use winit::{event_loop::EventLoop, monitor::MonitorHandle};
 
     // Create an EventLoop (required by winit to interact with the windowing system)
-    let event_loop = EventLoop::new(); // .expect("Winit was unable to create an event loop");
-                                       //event_loop.set_control_flow(winit::event_loop::ControlFlow::Wait);
+    let event_loop = winit::event_loop::EventLoopBuilder::new()
+        .with_any_thread(true)
+        .build(); // .expect("Winit was unable to create an event loop");
+                  //event_loop.set_control_flow(winit::event_loop::ControlFlow::Wait);
 
     // let mut app = ControlFlowDemo::default();
     // event_loop.run_app(&mut app);
