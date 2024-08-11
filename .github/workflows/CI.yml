@@ -107,26 +107,4 @@ jobs:
           platform: ${{ matrix.platform }}
           rust: ${{ matrix.rust }}
           feature: ${{ matrix.features }}
-          step: during
-
-    #  - name: Do something after the integration tests
-    #    if: always()
-    #    run: cargo run --example fix_integration2
-
-    #  - name: Take screenshot
-    #    if: always()
-     #   uses: ./.github/actions/screenshot
-     #   with:
-     #     step: after
-    #      rust: ${{ matrix.rust }}
-    #      platform: ${{ matrix.platform }}
-     #     feature: ${{ matrix.features }}
-
-      # Delete duplicate artifacts
-    #  - uses: geekyeggo/delete-artifact@v5
-    #    if: always()
-    #    with:
-    #      name: |
-    #        ${{ matrix.platform }}_${{ matrix.rust }}_desktop_before.jpg
-     #       ${{ matrix.platform }}_${{ matrix.rust }}_desktop_during.jpg
-    #        ${{ matrix.platform }}_${{ matrix.rust }}_desktop_after.jpg
+          step: after
