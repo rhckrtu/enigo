@@ -88,15 +88,6 @@ jobs:
         if: runner.os != 'Windows' # This step is only needed on Linux and macOS. The other OSs don't need to be set up
         uses: ./.github/actions/headless_display
 
-      - name: Take screenshot
-        uses: ./.github/actions/screenshot
-        if: runner.os != 'macOS'
-        with:
-          platform: ${{ matrix.platform }}
-          rust: ${{ matrix.rust }}
-          feature: ${{ matrix.features }}
-          step: before
-
       - name: Run integration tests
         run: cargo test integration --no-default-features --features ${{ matrix.features }} -- --test-threads=1 --include-ignored --nocapture
 
@@ -107,4 +98,3 @@ jobs:
           platform: ${{ matrix.platform }}
           rust: ${{ matrix.rust }}
           feature: ${{ matrix.features }}
-          step: after
