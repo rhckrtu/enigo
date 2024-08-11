@@ -86,9 +86,6 @@
 
                 // Send the form's content via WebSocket
                 ws.send(`Text(\"${text}\")`);
-
-                // Clear the input field after sending
-                document.getElementById('text').value = '';
             }
         });
 
