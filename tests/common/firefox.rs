@@ -12,7 +12,7 @@ pub static FIREFOX_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
 
         // Determine the Firefox command based on the operating system
         let firefox_cmd = if cfg!(target_os = "windows") {
-            "firefox.exe"
+            "start firefox"
         } else {
             "firefox"
         };
