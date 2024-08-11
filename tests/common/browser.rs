@@ -2,7 +2,7 @@
 // this is fine, as the OS can deallocate the terminated program faster than we can free memory
 // but tools like valgrind might report "memory leaks" as it isn't obvious this is intentional.
 // Launch Firefox
-pub static FIREFOX_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
+pub static BROWSER_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
     std::sync::LazyLock::new(|| {
         // Construct the URL
         let url = format!(
@@ -17,11 +17,11 @@ pub static FIREFOX_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
                 .spawn()
                 .expect("Failed to start Firefox on Windows")
         } else if cfg!(target_os = "macos") {
-            // On macOS, use the "open" command to run Firefox
+            // On macOS, use the "open" command to run Safari (Firefox is not preinstalled)
             std::process::Command::new("open")
-                .args(&["-a", "Firefox", &url])
+                .args(&["-a", "Safari", &url])
                 .spawn()
-                .expect("Failed to start Firefox on macOS")
+                .expect("Failed to start Safari on macOS")
         } else {
             // On Linux, use the "firefox" command
             std::process::Command::new("firefox")

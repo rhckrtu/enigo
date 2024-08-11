@@ -26,7 +26,7 @@ impl EnigoTest {
         env_logger::init();
         EnigoTest::start_timeout_thread();
         let enigo = Enigo::new(&settings).unwrap();
-        let _ = &*super::firefox::FIREFOX_INSTANCE; // Launch Firefox
+        let _ = &*super::browser::BROWSER_INSTANCE; // Launch Firefox
         let websocket = Self::websocket();
 
         std::thread::sleep(std::time::Duration::from_secs(5)); // Give Firefox some time to launch
@@ -34,7 +34,7 @@ impl EnigoTest {
     }
 
     // Maximize Firefox by pressing keys or moving the mouse
-    pub fn maximize_firefox(&mut self) {
+    pub fn maximize_browser(&mut self) {
         if cfg!(target_os = "macos") {
             self.key(Key::Control, Press).unwrap();
             self.key(Key::Meta, Press).unwrap();

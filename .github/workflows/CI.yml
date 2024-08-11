@@ -88,15 +88,6 @@ jobs:
         if: runner.os != 'Windows' # This step is only needed on Linux and macOS. The other OSs don't need to be set up
         uses: ./.github/actions/headless_display
 
-    #  - name: Start Firefox
-    #    shell: bash
-     #   run: |
-    #      if [ "$RUNNER_OS" == "Windows" ]; then
-    #        start firefox tests/index.html
-    #      else
-    #        firefox tests/index.html &
-     #     fi
-
       - name: Take screenshot
         uses: ./.github/actions/screenshot
         if: runner.os != 'macOS'
