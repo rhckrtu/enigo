@@ -101,6 +101,7 @@ impl Keyboard for EnigoTest {
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
         self.send_message("ClearText");
         let res = self.enigo.text(text);
+        std::thread::sleep(std::time::Duration::from_secs(1)); // Wait for text to have been typed
         self.send_message("GetText");
 
         loop {
