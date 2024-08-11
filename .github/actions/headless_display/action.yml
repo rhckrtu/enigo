@@ -28,7 +28,7 @@ runs:
     - name: Create virtual display with Xvfb
       if: runner.os != 'Windows'
       run: |
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        Xvfb :99 -screen 0 1024x768x32 > /dev/null 2>&1 &
         # Wait for Xvfb to start
         sleep 3
       shell: bash
