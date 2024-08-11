@@ -42,8 +42,8 @@ impl EnigoTest {
             //  self.key(Key::Control, Release).unwrap();
         } else {
             self.key(Key::F11, Click).unwrap();
-            // self.move_mouse(200, 200, Abs).unwrap();
-            // self.button(Button::Left, Click).unwrap();
+            self.move_mouse(200, 200, Abs).unwrap();
+            self.button(Button::Left, Click).unwrap();
         };
 
         // Wait for full screen animation
