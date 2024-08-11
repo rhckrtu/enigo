@@ -103,10 +103,11 @@ impl Keyboard for EnigoTest {
         let res = self.enigo.fast_text(text);
         self.send_message("GetText");
 
+        res.clone().unwrap();
         loop {
             if let BrowserEvent::Text(received_text) = self.read_message() {
                 println!("received text: {received_text}");
-                // assert_eq!(text, received_text);
+                assert_eq!(text, received_text);
                 break;
             }
         }
