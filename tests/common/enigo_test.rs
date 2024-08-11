@@ -12,8 +12,8 @@ use enigo::{
 use super::browser_events::BrowserEvent;
 
 const DELTA: i32 = 0; // TODO: Should there be a delta? Investigate if mouse acceleration can cause a delta
-const TIMEOUT: u64 = 10; // Number of minutes the test is allowed to run before timing out
-                         // This is needed, because some of the websocket functions are blocking and would run indefinitely without a timeout if they don't receive a message
+const TIMEOUT: u64 = 1; // Number of minutes the test is allowed to run before timing out
+                        // This is needed, because some of the websocket functions are blocking and would run indefinitely without a timeout if they don't receive a message
 const SCROLL_STEP: (i32, i32) = (20, 114); // (horizontal, vertical)
 
 pub struct EnigoTest {
