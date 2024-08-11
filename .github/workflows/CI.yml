@@ -99,6 +99,7 @@ jobs:
 
       - name: Take screenshot
         uses: ./.github/actions/screenshot
+        if: runner.os != 'macOS'
         with:
           platform: ${{ matrix.platform }}
           rust: ${{ matrix.rust }}
@@ -109,7 +110,7 @@ jobs:
         run: cargo test integration --no-default-features --features ${{ matrix.features }} -- --test-threads=1 --include-ignored --nocapture
 
       - name: Take screenshot
-        if: always() 
+        if: always() && runner.os != 'macOS'
         uses: ./.github/actions/screenshot
         with:
           platform: ${{ matrix.platform }}
