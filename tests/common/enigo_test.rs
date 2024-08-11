@@ -13,7 +13,7 @@ use super::browser_events::BrowserEvent;
 
 const TIMEOUT: u64 = 3; // Number of minutes the test is allowed to run before timing out
                         // This is needed, because some of the websocket functions are blocking and would run indefinitely without a timeout if they don't receive a message
-const INPUT_DELAY: u64 = 1500; // Number of milliseconds to wait for the input to have an effect
+const INPUT_DELAY: u64 = 10; // Number of milliseconds to wait for the input to have an effect
 const SCROLL_STEP: (i32, i32) = (20, 114); // (horizontal, vertical)
 
 pub struct EnigoTest {
@@ -102,7 +102,7 @@ impl Keyboard for EnigoTest {
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
         self.send_message("ClearText");
         let res = self.enigo.text(text);
-        std::thread::sleep(std::time::Duration::from_millis(INPUT_DELAY)); // Wait for input to have an effect
+        std::thread::sleep(std::time::Duration::from_secs(INPUT_DELAY)); // Wait for input to have an effect
         self.send_message("GetText");
 
         loop {
