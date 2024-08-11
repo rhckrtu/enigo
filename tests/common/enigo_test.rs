@@ -100,10 +100,7 @@ impl Keyboard for EnigoTest {
     // This does not work for all text or the library does not work properly
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
         self.send_message("ClearText");
-        std::thread::sleep(std::time::Duration::from_millis(3000));
         let res = self.enigo.fast_text(text);
-        let _ = self.enigo.key(Key::Unicode('a'), Direction::Click);
-        std::thread::sleep(std::time::Duration::from_millis(3000));
         self.send_message("GetText");
 
         loop {
