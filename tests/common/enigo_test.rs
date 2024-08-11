@@ -100,11 +100,9 @@ impl Keyboard for EnigoTest {
     // This does not work for all text or the library does not work properly
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
         self.send_message("ClearText");
-        let res = self.enigo.fast_text(text);
+        let res = self.enigo.text(text);
         self.send_message("GetText");
 
-        println!("result: {res:?}");
-        res.clone().unwrap();
         loop {
             if let BrowserEvent::Text(received_text) = self.read_message() {
                 println!("received text: {received_text}");
@@ -112,7 +110,7 @@ impl Keyboard for EnigoTest {
                 break;
             }
         }
-        res
+        res.map(Some) // TODO: Check if this is always correct
     }
 
     fn key(&mut self, key: Key, direction: Direction) -> enigo::InputResult<()> {
