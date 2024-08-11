@@ -38,8 +38,7 @@ impl EnigoTest {
         if cfg!(target_os = "macos") {
             self.key(Key::Control, Press).unwrap();
             self.key(Key::Meta, Press).unwrap();
-            self.key(Key::Unicode('f'), Press).unwrap();
-            self.key(Key::Unicode('f'), Release).unwrap();
+            self.key(Key::Unicode('f'), Click).unwrap();
             self.key(Key::Meta, Release).unwrap();
             self.key(Key::Control, Release).unwrap();
         } else {
