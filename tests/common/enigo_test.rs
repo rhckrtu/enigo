@@ -221,9 +221,11 @@ impl Mouse for EnigoTest {
         let res = self.enigo.main_display();
         match res {
             Ok((x, y)) => {
-                let (winit_x, winit_y) = winit_main_display();
-                assert_eq!(x, winit_x);
-                assert_eq!(y, winit_y);
+                let (rdev_x, rdev_y) = rdev_main_display();
+                println!("enigo display: {x},{y}");
+                println!("rdev_display: {rdev_x},{rdev_y}");
+                assert_eq!(x, rdev_x);
+                assert_eq!(y, rdev_y);
             }
             Err(_) => todo!(),
         }
@@ -232,72 +234,33 @@ impl Mouse for EnigoTest {
 
     // Edge cases don't work (mouse is at the left most border and can't move one to the left)
     fn location(&self) -> enigo::InputResult<(i32, i32)> {
-        let (x, y) = self
-            .enigo
-            .location()
-            .expect("Error executing enigo.location()");
-        println!("Executed enigo.location()");
-
-        self.enigo.move_mouse(-1, 0, Coordinate::Rel);
-        self.enigo.move_mouse(1, 0, Coordinate::Rel);
-        println!("Moved mouse one pixel to the left and back");
-
-        let _ = self.read_message();
-        let ev = self.read_message();
-        println!("Done waiting");
-
-        if let BrowserEvent::MouseMove(_, (mouse_x, mouse_y)) = ev {
-            assert_eq!(x, mouse_x);
-            assert_eq!(y, mouse_y);
-            println!("enigo.move_mouse() was a success");
-        } else {
-            panic!("BrowserEvent was not a MouseMove: {ev:?}");
-        };
-
-        Ok((x, y))
+        let res = self.enigo.location();
+        match res {
+            Ok((x, y)) => {
+                let (mouse_x, mouse_y) = mouse_position();
+                println!("enigo_position: {x},{y}");
+                println!("mouse_position: {mouse_x},{mouse_y}");
+                assert_eq!(x, mouse_x);
+                assert_eq!(y, mouse_y);
+            }
+            Err(_) => todo!(),
+        }
+        res
     }
 }
 
-fn winit_main_display() -> (i32, i32) {
-    use winit::{event_loop::EventLoop, monitor::MonitorHandle};
-
-    // Create an EventLoop (required by winit to interact with the windowing system)
-    let event_loop = winit::event_loop::EventLoopBuilder::new()
-        .with_any_thread(true)
-        .build(); // .expect("Winit was unable to create an event loop");
-                  //event_loop.set_control_flow(winit::event_loop::ControlFlow::Wait);
-
-    // let mut app = ControlFlowDemo::default();
-    // event_loop.run_app(&mut app);
-
-    // Get the primary monitor handle
-    let primary_monitor: MonitorHandle = event_loop
-        .primary_monitor()
-        .expect("No primary monitor found. This is always the case when using Wayland/Web");
-
-    // Get the dimensions of the primary monitor
-    let size = primary_monitor.size();
-
-    (
-        size.width.try_into().unwrap(),
-        size.height.try_into().unwrap(),
-    )
+fn rdev_main_display() -> (i32, i32) {
+    use rdev::display_size;
+    let (x, y) = display_size().unwrap();
+    (x.try_into().unwrap(), y.try_into().unwrap())
 }
 
-fn winit_location() -> (i32, i32) {
-    use winit::{dpi::PhysicalPosition, event_loop::EventLoop, window::WindowBuilder};
+fn mouse_position() -> (i32, i32) {
+    use mouse_position::mouse_position::Mouse;
 
-    // Create an EventLoop (required by winit to interact with the windowing system)
-    let event_loop = EventLoop::new(); // .expect("Winit was unable to create an event loop");
-
-    // Create a hidden window to query cursor position
-    let window = WindowBuilder::new()
-        .with_visible(false)
-        .build(&event_loop)
-        .unwrap();
-
-    // Get the cursor's position relative to the top-left of the primary monitor
-    let cursor_position: PhysicalPosition<i32> = window.current_monitor().unwrap().position();
-
-    (cursor_position.x, cursor_position.y)
+    if let Mouse::Position { x, y } = Mouse::get_mouse_position() {
+        (x, y)
+    } else {
+        panic!("the crate mouse_location was unable to get the position of the mouse");
+    }
 }
