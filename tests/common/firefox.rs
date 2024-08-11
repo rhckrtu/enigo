@@ -16,12 +16,18 @@ pub static FIREFOX_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
                 .args(&["/C", "start", "firefox", &url])
                 .spawn()
                 .expect("Failed to start Firefox on Windows")
-        } else {
-            // On Linux and macOS, simply use "firefox" command
-            std::process::Command::new("firefox")
-                .arg(url)
+        } else if cfg!(target_os = "macos") {
+            // On macOS, use the `open` command to launch Firefox
+            std::process::Command::new("open")
+                .args(&["-a", "Firefox", &url])
                 .spawn()
-                .expect("Failed to start Firefox on Linux/macOS")
+                .expect("Failed to start Firefox on macOS")
+        } else {
+            // On Linux, simply use "firefox" command
+            std::process::Command::new("firefox")
+                .arg(&url)
+                .spawn()
+                .expect("Failed to start Firefox on Linux")
         };
         Some(child)
     });
