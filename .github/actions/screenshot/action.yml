@@ -30,6 +30,6 @@ runs:
       run: DISPLAY=$DISPLAY import -window root -quality 90 ./'${{ inputs.platform }}_${{ inputs.rust }}_desktop_${{ inputs.step }}_${{ inputs.feature }}.jpg'
     - uses: actions/upload-artifact@v4
       with:
-        name: desktop_${{ inputs.step }}
+        name: '${{ inputs.platform }}_${{ inputs.rust }}_desktop_${{ inputs.step }}_${{ inputs.feature }}'
         path: '${{ inputs.platform }}_${{ inputs.rust }}_desktop_${{ inputs.step }}_${{ inputs.feature }}.jpg'
         overwrite: true
