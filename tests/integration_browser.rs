@@ -1,5 +1,6 @@
 use enigo::{
     Axis::{Horizontal, Vertical},
+    Button,
     Coordinate::{Abs, Rel},
     Direction::{Click, Press, Release},
     Key, Keyboard, Mouse, Settings,
@@ -24,6 +25,7 @@ fn integration_browser_events() {
     enigo.key(Key::Backspace, Release).unwrap();
 
     println!("Test mouse");
+    enigo.button(Button::Left, Click).unwrap();
     enigo.move_mouse(100, 100, Abs).unwrap();
     enigo.move_mouse(200, 200, Abs).unwrap();
     // let (x, y) = enigo.location().unwrap();
