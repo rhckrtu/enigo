@@ -106,9 +106,6 @@ jobs:
           feature: ${{ matrix.features }}
           step: before
 
-      - name: Check if Firefox is installed
-        run: which safari
-
       - name: Run integration tests
         run: cargo test integration --no-default-features --features ${{ matrix.features }} -- --test-threads=1 --include-ignored --nocapture
 
