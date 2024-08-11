@@ -26,7 +26,7 @@ jobs:
           - macos-latest
         features:
          # - "--all-features"
-         # - "--features default"
+          - "--features default"
          # - "--features libei"
          # - "--features wayland"
           - "--features xdo"
