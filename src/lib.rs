@@ -236,6 +236,7 @@ pub trait Keyboard {
         let fast_text_res = self.fast_text(text);
         match fast_text_res {
             Ok(Some(())) => {
+                println!("fast text entry was successful");
                 debug!("fast text entry was successful");
                 Ok(())
             }
