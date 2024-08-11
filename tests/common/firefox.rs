@@ -10,7 +10,14 @@ pub static FIREFOX_INSTANCE: std::sync::LazyLock<Option<std::process::Child>> =
             std::env::current_dir().unwrap().to_str().unwrap()
         );
 
-        let child = std::process::Command::new("firefox")
+        // Determine the Firefox command based on the operating system
+        let firefox_cmd = if cfg!(target_os = "windows") {
+            "firefox.exe"
+        } else {
+            "firefox"
+        };
+
+        let child = std::process::Command::new(firefox_cmd)
             .arg(url)
             .spawn()
             .expect("Failed to start Firefox");
