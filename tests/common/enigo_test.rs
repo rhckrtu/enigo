@@ -101,7 +101,7 @@ impl Keyboard for EnigoTest {
     fn fast_text(&mut self, text: &str) -> enigo::InputResult<Option<()>> {
         self.send_message("ClearText");
         let res = self.enigo.text(text);
-        std::thread::sleep(std::time::Duration::from_secs(1)); // Wait for text to have been typed
+        std::thread::sleep(std::time::Duration::from_millis(50)); // Wait for input to have an effect
         self.send_message("GetText");
 
         loop {
@@ -116,6 +116,7 @@ impl Keyboard for EnigoTest {
 
     fn key(&mut self, key: Key, direction: Direction) -> enigo::InputResult<()> {
         let res = self.enigo.key(key, direction);
+        std::thread::sleep(std::time::Duration::from_millis(50)); // Wait for input to have an effect
         if direction == Press || direction == Click {
             let ev = self.read_message();
             if let BrowserEvent::KeyDown(name) = ev {
@@ -158,6 +159,7 @@ impl Keyboard for EnigoTest {
 impl Mouse for EnigoTest {
     fn button(&mut self, button: enigo::Button, direction: Direction) -> enigo::InputResult<()> {
         let res = self.enigo.button(button, direction);
+        std::thread::sleep(std::time::Duration::from_millis(50)); // Wait for input to have an effect
         if direction == Press || direction == Click {
             let ev = self.read_message();
             if let BrowserEvent::MouseDown(name) = ev {
@@ -183,6 +185,7 @@ impl Mouse for EnigoTest {
     fn move_mouse(&mut self, x: i32, y: i32, coordinate: Coordinate) -> enigo::InputResult<()> {
         let res = self.enigo.move_mouse(x, y, coordinate);
         println!("Executed enigo.move_mouse");
+        std::thread::sleep(std::time::Duration::from_millis(50)); // Wait for input to have an effect
 
         let ev = self.read_message();
         println!("Done waiting");
@@ -206,6 +209,7 @@ impl Mouse for EnigoTest {
         let mut length = length;
         let res = self.enigo.scroll(length, axis);
         println!("Executed Enigo");
+        std::thread::sleep(std::time::Duration::from_millis(50)); // Wait for input to have an effect
 
         // On some platforms it is not possible to scroll multiple lines so we repeatedly scroll. In order for this test to work on all platforms, both cases are not differentiated
         let (mut mouse_scroll, mut step) = (0, 0);
