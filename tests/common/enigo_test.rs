@@ -120,7 +120,13 @@ impl Keyboard for EnigoTest {
             let ev = self.read_message();
             if let BrowserEvent::KeyDown(name) = ev {
                 println!("received pressed key: {name}");
-                assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
+                let key_name = if let Key::Unicode(char) = key {
+                    format!("{char}")
+                } else {
+                    format!("{key:?}").to_lowercase()
+                };
+                println!("key_name: {key_name}");
+                assert_eq!(key_name, name.to_lowercase());
             } else {
                 panic!("BrowserEvent was not a KeyDown: {ev:?}");
             }
@@ -129,7 +135,13 @@ impl Keyboard for EnigoTest {
             let ev = self.read_message();
             if let BrowserEvent::KeyUp(name) = ev {
                 println!("received released key: {name}");
-                assert_eq!(format!("{key:?}").to_lowercase(), name.to_lowercase());
+                let key_name = if let Key::Unicode(char) = key {
+                    format!("{char}")
+                } else {
+                    format!("{key:?}").to_lowercase()
+                };
+                println!("key_name: {key_name}");
+                assert_eq!(key_name, name.to_lowercase());
             } else {
                 panic!("BrowserEvent was not a KeyUp: {ev:?}");
             }
