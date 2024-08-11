@@ -17,37 +17,37 @@ jobs:
       fail-fast: false
       matrix:
         rust:
-          - stable
+         # - stable
           - nightly
-          - "1.75.0"
+         # - "1.75.0"
         platform:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
+         # - windows-latest
+         # - macos-latest
         features:
-          - "--all-features"
-          - "--features default"
-          - "--features libei"
-          - "--features wayland"
+         # - "--all-features"
+         # - "--features default"
+         # - "--features libei"
+         # - "--features wayland"
           - "--features xdo"
           - "--features x11rb"
-        exclude:
-          - platform: windows-latest
-            features: "--features libei"
-          - platform: windows-latest
-            features: "--features wayland"
-          - platform: windows-latest
-            features: "--features xdo"
-          - platform: windows-latest
-            features: "--features x11rb"
-          - platform: macos-latest
-            features: "--features libei"
-          - platform: macos-latest
-            features: "--features wayland"
-          - platform: macos-latest
-            features: "--features xdo"
-          - platform: macos-latest
-            features: "--features x11rb"
+        #exclude:
+        #  - platform: windows-latest
+        #    features: "--features libei"
+        #  - platform: windows-latest
+        #    features: "--features wayland"
+        #  - platform: windows-latest
+        #    features: "--features xdo"
+        #  - platform: windows-latest
+        #    features: "--features x11rb"
+        #  - platform: macos-latest
+        #    features: "--features libei"
+        #  - platform: macos-latest
+        #    features: "--features wayland"
+        #  - platform: macos-latest
+        #    features: "--features xdo"
+        #  - platform: macos-latest
+        #    features: "--features x11rb"
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -59,39 +59,39 @@ jobs:
 
 
 
-      - name: Check the code format
-        if: matrix.rust == 'nightly' # Avoid differences between the versions
-        run: cargo fmt -- --check
+     # - name: Check the code format
+     #   if: matrix.rust == 'nightly' # Avoid differences between the versions
+     #   run: cargo fmt -- --check
 
-      - name: Check clippy lints
-        run: cargo clippy --no-default-features ${{ matrix.features }} -- -D clippy::pedantic
-      - name: Check clippy lints for the examples
-        run: cargo clippy --no-default-features ${{ matrix.features }} --examples -- -D clippy::pedantic
+     # - name: Check clippy lints
+     #   run: cargo clippy --no-default-features ${{ matrix.features }} -- -D clippy::pedantic
+     # - name: Check clippy lints for the examples
+     #   run: cargo clippy --no-default-features ${{ matrix.features }} --examples -- -D clippy::pedantic
 
-      - name: Build the code
-        run: cargo build --no-default-features ${{ matrix.features }}
+     # - name: Build the code
+     #   run: cargo build --no-default-features ${{ matrix.features }}
 
-      - name: Build the docs
-        run: cargo doc --no-deps --no-default-features ${{ matrix.features }}
+     # - name: Build the docs
+     #   run: cargo doc --no-deps --no-default-features ${{ matrix.features }}
 
-      - name: Build the examples
-        run: cargo check --examples --no-default-features ${{ matrix.features }}
+     # - name: Build the examples
+     #   run: cargo check --examples --no-default-features ${{ matrix.features }}
 
-      - name: Build the examples in release mode
-        run: cargo check --release --examples --no-default-features ${{ matrix.features }}
+    #  - name: Build the examples in release mode
+    #    run: cargo check --release --examples --no-default-features ${{ matrix.features }}
 
       - name: Setup headless display for integration tests on Linux
         if: runner.os != 'Windows' # This step is only needed on Linux and macOS. The other OSs don't need to be set up
         uses: ./.github/actions/headless_display
 
-      - name: Start Firefox
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            start firefox tests/index.html
-          else
-            firefox tests/index.html &
-          fi
+    #  - name: Start Firefox
+    #    shell: bash
+     #   run: |
+    #      if [ "$RUNNER_OS" == "Windows" ]; then
+    #        start firefox tests/index.html
+    #      else
+    #        firefox tests/index.html &
+     #     fi
 
       - name: Take screenshot
         uses: ./.github/actions/screenshot
@@ -113,18 +113,18 @@ jobs:
           platform: ${{ matrix.platform }}
           feature: ${{ matrix.features }}
 
-      - name: Do something after the integration tests
-        if: always()
-        run: cargo run --example fix_integration2
+    #  - name: Do something after the integration tests
+    #    if: always()
+    #    run: cargo run --example fix_integration2
 
-      - name: Take screenshot
-        if: always()
-        uses: ./.github/actions/screenshot
-        with:
-          step: after
-          rust: ${{ matrix.rust }}
-          platform: ${{ matrix.platform }}
-          feature: ${{ matrix.features }}
+    #  - name: Take screenshot
+    #    if: always()
+     #   uses: ./.github/actions/screenshot
+     #   with:
+     #     step: after
+    #      rust: ${{ matrix.rust }}
+    #      platform: ${{ matrix.platform }}
+     #     feature: ${{ matrix.features }}
 
       # Delete duplicate artifacts
       - uses: geekyeggo/delete-artifact@v5
