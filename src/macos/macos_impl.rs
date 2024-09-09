@@ -1,4 +1,4 @@
-use std::os::raw::{c_char, c_int, c_uchar, c_uint, c_ulong, c_ushort, c_void};
+use std::os::raw::{c_char, c_uint, c_void};
 use std::{
     thread,
     time::{Duration, Instant},
@@ -7,7 +7,7 @@ use std::{
 use core_foundation::array::CFIndex; // TODO: Double check this (should be Int)
 use core_foundation::dictionary::{CFDictionary, CFDictionaryRef};
 use core_foundation::{
-    base::{Boolean, OSStatus, SInt32, TCFType, UInt16, UInt32, UInt8},
+    base::{Boolean, OSStatus, TCFType, UInt16, UInt32, UInt8},
     string::UniChar,
 };
 use core_graphics::{
@@ -45,30 +45,6 @@ type OptionBits = UInt32;
 type CFStringEncoding = UInt32;
 
 const TRUE: c_uint = 1;
-
-#[allow(non_snake_case)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-struct UCKeyboardTypeHeader {
-    keyboardTypeFirst: UInt32,
-    keyboardTypeLast: UInt32,
-    keyModifiersToTableNumOffset: UInt32,
-    keyToCharTableIndexOffset: UInt32,
-    keyStateRecordsIndexOffset: UInt32,
-    keyStateTerminatorsOffset: UInt32,
-    keySequenceDataIndexOffset: UInt32,
-}
-
-#[allow(non_snake_case)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-struct UCKeyboardLayout {
-    keyLayoutHeaderFormat: UInt16,
-    keyLayoutDataVersion: UInt16,
-    keyLayoutFeatureInfoOffset: UInt32,
-    keyboardTypeCount: UInt32,
-    keyboardTypeList: [UCKeyboardTypeHeader; 1usize],
-}
 
 #[allow(non_upper_case_globals)]
 const kUCKeyTranslateNoDeadKeysBit: u32 = 0;
