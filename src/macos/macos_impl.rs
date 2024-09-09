@@ -8,7 +8,7 @@ use core_foundation::array::CFIndex; // TODO: Double check this (should be Int)
 use core_foundation::dictionary::{CFDictionary, CFDictionaryRef};
 use core_foundation::{
     base::{Boolean, OSStatus, TCFType, UInt16, UInt32, UInt8},
-    string::UniChar,
+    string::{kCFStringEncodingUTF8, CFStringRef, UniChar},
 };
 use core_graphics::{
     display::{CGDisplay, CGPoint},
@@ -35,11 +35,6 @@ type CFDataRef = *const c_void;
 struct __TISInputSource;
 type TISInputSourceRef = *const __TISInputSource;
 
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-struct __CFString([u8; 0]);
-type CFStringRef = *const __CFString;
-
 type OptionBits = UInt32;
 
 type CFStringEncoding = UInt32;
@@ -53,9 +48,6 @@ const kUCKeyTranslateNoDeadKeysBit: u32 = 0;
 #[derive(Debug, Copy, Clone)]
 struct __CFAllocator([u8; 0]);
 type CFAllocatorRef = *const __CFAllocator;
-
-#[allow(non_upper_case_globals)]
-const kCFStringEncodingUTF8: u32 = 0x0800_0100;
 
 #[allow(improper_ctypes)]
 #[link(name = "Carbon", kind = "framework")]
