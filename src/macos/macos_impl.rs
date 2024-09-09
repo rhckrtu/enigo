@@ -7,8 +7,11 @@ use std::{
 use core_foundation::array::CFIndex; // TODO: Double check this (should be Int)
 use core_foundation::dictionary::{CFDictionary, CFDictionaryRef};
 use core_foundation::{
-    base::{Boolean, OSStatus, TCFType, UInt16, UInt32, UInt8},
-    string::{kCFStringEncodingUTF8, CFStringRef, UniChar},
+    base::{kCFAllocatorDefault, Boolean, OSStatus, TCFType, UInt16, UInt32, UInt8},
+    string::{
+        kCFStringEncodingUTF8, CFStringCreateWithCharacters, CFStringGetLength, CFStringRef,
+        UniChar,
+    },
 };
 use core_graphics::{
     display::{CGDisplay, CGPoint},
@@ -44,11 +47,6 @@ const TRUE: c_uint = 1;
 #[allow(non_upper_case_globals)]
 const kUCKeyTranslateNoDeadKeysBit: u32 = 0;
 
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-struct __CFAllocator([u8; 0]);
-type CFAllocatorRef = *const __CFAllocator;
-
 #[allow(improper_ctypes)]
 #[link(name = "Carbon", kind = "framework")]
 extern "C" {
@@ -83,19 +81,6 @@ extern "C" {
     ) -> OSStatus;
 
     fn LMGetKbdType() -> UInt8;
-
-    #[allow(non_snake_case)]
-    fn CFStringCreateWithCharacters(
-        alloc: CFAllocatorRef,
-        chars: *const UniChar,
-        numChars: CFIndex,
-    ) -> CFStringRef;
-
-    #[allow(non_upper_case_globals)]
-    static kCFAllocatorDefault: CFAllocatorRef;
-
-    #[allow(non_snake_case)]
-    fn CFStringGetLength(theString: CFStringRef) -> CFIndex;
 
     #[allow(non_snake_case)]
     fn CFStringGetCString(
