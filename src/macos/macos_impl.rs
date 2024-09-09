@@ -899,6 +899,7 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> CFStringRef {
 extern "C" {
     pub fn AXIsProcessTrustedWithOptions(options: CFDictionaryRef) -> bool;
     pub fn AXIsProcessTrusted() -> bool;
+    static kAXTrustedCheckOptionPrompt: CFStringRef;
 }
 
 /// Check if the currently running application has the permissions to simulate input
@@ -907,7 +908,10 @@ extern "C" {
 pub fn has_permission(open_prompt_to_get_permissions: bool) -> bool {
     use core_foundation::string::CFString;
 
-    let key = CFString::new("kAXTrustedCheckOptionPrompt");
+    let key = unsafe { kAXTrustedCheckOptionPrompt };
+
+    println!("kAXTrustedCheckOptionPrompt: {key:?}");
+
     let value = if open_prompt_to_get_permissions {
         println!("Open the system prompt if the permissions are missing.");
         core_foundation::boolean::CFBoolean::true_value()
@@ -915,6 +919,7 @@ pub fn has_permission(open_prompt_to_get_permissions: bool) -> bool {
         println!("Do not open the system prompt if the permissions are missing.");
         core_foundation::boolean::CFBoolean::false_value()
     };
+    let value = value.as_CFTypeRef();
 
     println!("1");
     let options = CFDictionary::from_CFType_pairs(&[(key, value)]);
@@ -922,7 +927,7 @@ pub fn has_permission(open_prompt_to_get_permissions: bool) -> bool {
     let options = options.as_concrete_TypeRef();
     println!("3");
     unsafe { AXIsProcessTrustedWithOptions(options) }
-    // unsafe { AXIsProcessTrusted() }
+    //unsafe { AXIsProcessTrusted() }
 }
 
 impl Drop for Enigo {
