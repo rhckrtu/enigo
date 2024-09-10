@@ -1,5 +1,4 @@
-use core::panic;
-use std::os::raw::{c_uint, c_void};
+use std::os::raw::c_void;
 use std::{
     thread,
     time::{Duration, Instant},
@@ -9,10 +8,7 @@ use core_foundation::array::CFIndex; // TODO: Double check this (should be Int)
 use core_foundation::{
     base::{kCFAllocatorDefault, OSStatus, TCFType, UInt16, UInt32, UInt8},
     dictionary::{CFDictionary, CFDictionaryRef},
-    string::{
-        kCFStringEncodingUTF8, CFString, CFStringCreateWithCharacters, CFStringGetCString,
-        CFStringGetLength, CFStringRef, UniChar,
-    },
+    string::{CFString, CFStringCreateWithCharacters, CFStringRef, UniChar},
 };
 use core_graphics::{
     display::{CGDisplay, CGPoint},
@@ -40,8 +36,6 @@ struct __TISInputSource;
 type TISInputSourceRef = *const __TISInputSource;
 
 type OptionBits = UInt32;
-
-const TRUE: c_uint = 1;
 
 #[allow(non_upper_case_globals)]
 const kUCKeyTranslateNoDeadKeysBit: u32 = 0;
