@@ -1,3 +1,4 @@
+use core::panic;
 use std::os::raw::{c_uint, c_void};
 use std::{
     thread,
@@ -816,7 +817,7 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> CFStringRef {
     // let mut chars: *mut c_void;//[UniChar; 4];
     let mut chars: u16 = 0;
     let mut real_length = 0;
-    unsafe {
+    let status = unsafe {
         UCKeyTranslate(
             keyboard_layout,
             keycode,
@@ -828,7 +829,12 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> CFStringRef {
             8, // sizeof(chars) / sizeof(chars[0]),
             &mut real_length,
             &mut chars,
-        );
+        )
+    };
+
+    if status != 0 {
+        error!("UCKeyTranslate failed with status: {status}");
+        panic!("Jo"); // TODO: Don't panic
     }
 
     unsafe { CFStringCreateWithCharacters(kCFAllocatorDefault, &chars, 1) }
