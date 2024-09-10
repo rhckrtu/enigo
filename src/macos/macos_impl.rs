@@ -800,8 +800,7 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> Option<CFStringRef> {
     let keyboard_layout = unsafe { CFDataGetBytePtr(layout_data) };
 
     let mut keys_down: UInt32 = 0;
-    // let mut chars: *mut c_void;//[UniChar; 4];
-    let mut chars: u16 = 0;
+    let mut chars: [UniChar; 1] = [0];
     let mut real_length = 0;
     let status = unsafe {
         UCKeyTranslate(
@@ -814,7 +813,7 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> Option<CFStringRef> {
             &mut keys_down,
             8, // sizeof(chars) / sizeof(chars[0]),
             &mut real_length,
-            &mut chars,
+            chars.as_mut_ptr(),
         )
     };
 
@@ -823,7 +822,13 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> Option<CFStringRef> {
         return None;
     }
 
-    unsafe { Some(CFStringCreateWithCharacters(kCFAllocatorDefault, &chars, 1)) }
+    unsafe {
+        Some(CFStringCreateWithCharacters(
+            kCFAllocatorDefault,
+            chars.as_ptr(),
+            1,
+        ))
+    }
 }
 
 #[link(name = "ApplicationServices", kind = "framework")]
