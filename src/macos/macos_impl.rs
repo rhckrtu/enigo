@@ -1,16 +1,16 @@
-use std::os::raw::{c_char, c_uint, c_void};
+use std::os::raw::{c_uint, c_void};
 use std::{
     thread,
     time::{Duration, Instant},
 };
 
 use core_foundation::array::CFIndex; // TODO: Double check this (should be Int)
-use core_foundation::dictionary::{CFDictionary, CFDictionaryRef};
 use core_foundation::{
-    base::{kCFAllocatorDefault, Boolean, OSStatus, TCFType, UInt16, UInt32, UInt8},
+    base::{kCFAllocatorDefault, OSStatus, TCFType, UInt16, UInt32, UInt8},
+    dictionary::{CFDictionary, CFDictionaryRef},
     string::{
-        kCFStringEncodingUTF8, CFStringCreateWithCharacters, CFStringGetLength, CFStringRef,
-        UniChar,
+        kCFStringEncodingUTF8, CFStringCreateWithCharacters, CFStringGetCString, CFStringGetLength,
+        CFStringRef, UniChar,
     },
 };
 use core_graphics::{
@@ -39,8 +39,6 @@ struct __TISInputSource;
 type TISInputSourceRef = *const __TISInputSource;
 
 type OptionBits = UInt32;
-
-type CFStringEncoding = UInt32;
 
 const TRUE: c_uint = 1;
 
@@ -81,14 +79,6 @@ extern "C" {
     ) -> OSStatus;
 
     fn LMGetKbdType() -> UInt8;
-
-    #[allow(non_snake_case)]
-    fn CFStringGetCString(
-        theString: CFStringRef,
-        buffer: *mut c_char,
-        bufferSize: CFIndex,
-        encoding: CFStringEncoding,
-    ) -> Boolean;
 }
 
 /// The main struct for handling the event emitting
