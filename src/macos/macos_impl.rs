@@ -811,7 +811,7 @@ fn create_string_for_key(keycode: u16, modifier: u32) -> Option<CFStringRef> {
             LMGetKbdType() as u32,
             kUCKeyTranslateNoDeadKeysBit,
             &mut keys_down,
-            8, // sizeof(chars) / sizeof(chars[0]),
+            chars.len() as CFIndex,
             &mut real_length,
             chars.as_mut_ptr(),
         )
